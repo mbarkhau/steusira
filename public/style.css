@@ -3,6 +3,14 @@
   --fg: #1c1c1a;
   --muted: #6b6b66;
   --accent: #2f6f5e;
+  --surface: #ffffff;
+  --border: #e2e2dc;
+  --track: #efefea;
+  --g-einkommen: #3b6ea5;
+  --g-sozial: #2f8f78;
+  --g-arbeitgeber: #7a5ca8;
+  --g-konsum: #c27c2c;
+  --g-abgabe: #9a9a92;
   color-scheme: light dark;
 }
 
@@ -12,6 +20,14 @@
     --fg: #ecece8;
     --muted: #9a9a94;
     --accent: #6fbfa8;
+    --surface: #1d1d1b;
+    --border: #33332f;
+    --track: #2a2a27;
+    --g-einkommen: #6f9fd6;
+    --g-sozial: #5fbfa4;
+    --g-arbeitgeber: #a68bd4;
+    --g-konsum: #e0a25a;
+    --g-abgabe: #85857e;
   }
 }
 
@@ -58,3 +74,215 @@ footer {
 }
 
 footer p { margin: 0; }
+
+
+/* Rechner */
+
+main.rechner {
+  justify-content: flex-start;
+  max-width: 72rem;
+}
+
+.kopf { margin-bottom: 2rem; }
+.kopf .lede { max-width: 40rem; font-size: 1.125rem; }
+
+.layout {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+@media (min-width: 60rem) {
+  .layout { grid-template-columns: minmax(0, 1fr) minmax(0, 26rem); align-items: start; }
+  .ergebnis { position: sticky; top: 1rem; max-height: calc(100vh - 2rem); overflow-y: auto; }
+}
+
+.eingabe { display: flex; flex-direction: column; gap: 0.75rem; }
+
+.abschnitt, .ergebnis {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+}
+
+.abschnitt summary {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.875rem 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  list-style: none;
+}
+
+.abschnitt summary::-webkit-details-marker { display: none; }
+.abschnitt summary::before { content: "▸"; color: var(--muted); margin-right: -0.5rem; }
+.abschnitt[open] summary::before { content: "▾"; }
+.abschnitt summary > span:first-of-type { flex: 1; }
+.abschnitt .summe { color: var(--muted); font-weight: 500; font-variant-numeric: tabular-nums; }
+
+.felder {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 16rem), 1fr));
+  gap: 1rem 1.25rem;
+  padding: 0.25rem 1rem 1.25rem;
+}
+
+.feld { display: flex; flex-direction: column; gap: 0.25rem; min-width: 0; }
+.feld[hidden] { display: none; }
+.feld > label { font-size: 0.9375rem; font-weight: 500; }
+.feld small { color: var(--muted); font-size: 0.8125rem; line-height: 1.4; }
+.feld.check, .feld.paar { grid-column: 1 / -1; }
+.feld.paar .zahl { max-width: 16rem; }
+.feld.check label { display: flex; gap: 0.5rem; align-items: baseline; cursor: pointer; }
+.feld.check input { accent-color: var(--accent); }
+
+.zeile { display: flex; align-items: center; gap: 0.5rem; }
+.zu { color: var(--muted); font-size: 0.875rem; }
+
+.zahl {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  align-items: center;
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  background: var(--bg);
+}
+
+.zahl:focus-within { border-color: var(--accent); outline: 2px solid color-mix(in srgb, var(--accent) 30%, transparent); }
+
+.zahl input {
+  flex: 1;
+  min-width: 0;
+  width: 100%;
+  padding: 0.5rem 0.625rem;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  outline: none;
+}
+
+.einheit { padding-right: 0.625rem; color: var(--muted); font-size: 0.8125rem; white-space: nowrap; }
+
+select {
+  padding: 0.5rem 0.625rem;
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  background: var(--bg);
+  color: inherit;
+  font: inherit;
+}
+
+.ergebnis { padding: 1.25rem; }
+.ergebnis h2 { margin: 1.5rem 0 0.5rem; font-size: 1rem; }
+
+.kpi p { margin: 0; }
+.kpi-label { color: var(--muted); font-size: 0.9375rem; }
+.kpi-wert {
+  font-size: clamp(2rem, 6vw, 2.75rem);
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  font-variant-numeric: tabular-nums;
+}
+.kpi-sub { color: var(--muted); font-size: 0.875rem; }
+
+.tage {
+  margin: 1rem 0;
+  padding: 0.625rem 0.75rem;
+  border-left: 3px solid var(--accent);
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+  font-size: 0.9375rem;
+}
+.tage:empty { display: none; }
+
+.tabs { display: flex; gap: 0.25rem; margin: 1rem 0 0.75rem; border-bottom: 1px solid var(--border); }
+.tabs button {
+  padding: 0.375rem 0.75rem;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: none;
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.9375rem;
+  cursor: pointer;
+}
+.tabs button[aria-selected="true"] { color: var(--fg); border-bottom-color: var(--accent); }
+
+.balken { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 0.625rem; }
+.balken li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.125rem 0.75rem;
+  font-size: 0.875rem;
+}
+.balken .wert { font-variant-numeric: tabular-nums; font-weight: 500; }
+.spur {
+  grid-column: 1 / -1;
+  display: flex;
+  height: 0.5rem;
+  border-radius: 0.25rem;
+  background: var(--track);
+  overflow: hidden;
+}
+.seg { height: 100%; }
+.seg + .seg { border-left: 1px solid var(--surface); }
+
+.g-einkommen { background: var(--g-einkommen); }
+.g-sozial { background: var(--g-sozial); }
+.g-arbeitgeber { background: var(--g-arbeitgeber); }
+.g-konsum { background: var(--g-konsum); }
+.g-abgabe { background: var(--g-abgabe); }
+
+.legende {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1rem;
+  margin: 1rem 0 0;
+  padding: 0;
+  list-style: none;
+  color: var(--muted);
+  font-size: 0.8125rem;
+}
+.legende li { display: flex; align-items: center; gap: 0.375rem; }
+.punkt { width: 0.625rem; height: 0.625rem; border-radius: 50%; }
+
+.bilanz { width: 100%; border-collapse: collapse; font-size: 0.9375rem; }
+.bilanz th { text-align: left; font-weight: 400; }
+.bilanz td { text-align: right; font-variant-numeric: tabular-nums; }
+.bilanz th, .bilanz td { padding: 0.25rem 0; }
+.bilanz tr.summe th, .bilanz tr.summe td { font-weight: 600; border-top: 1px solid var(--border); }
+.bilanz caption {
+  caption-side: bottom;
+  padding-top: 0.5rem;
+  text-align: left;
+  color: var(--muted);
+  font-size: 0.8125rem;
+}
+
+.hinweise { margin-top: 1.5rem; font-size: 0.8125rem; color: var(--muted); }
+.hinweise summary { cursor: pointer; font-weight: 500; }
+.hinweise ul { padding-left: 1.25rem; }
+.hinweise li + li { margin-top: 0.25rem; }
+
+.leiste { display: none; }
+
+@media (max-width: 59.99rem) {
+  .leiste.sichtbar {
+    display: block;
+    position: fixed;
+    inset: auto 0 0 0;
+    padding: 0.75rem 1rem;
+    background: var(--fg);
+    color: var(--bg);
+    font-size: 0.9375rem;
+    font-weight: 500;
+    text-align: center;
+    cursor: pointer;
+  }
+  footer { padding-bottom: 4rem; }
+}
