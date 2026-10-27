@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026.10004
+
+Remove the personal name from the website content (no plan).
+
+- `public/index.html`: the footer shows "Steusira" in place of "mbarkhau".
+- Validation: `npm test` (all pass). No reference to "mbarkhau" remains in `public/`.
+
+
 ## 2026.10003
 
 Label of the draft year (no plan).
