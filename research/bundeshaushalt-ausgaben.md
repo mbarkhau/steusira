@@ -92,6 +92,40 @@ Kernhaushalt, so it is not correct to simply add them to the Kernhaushalt.
 |      | Other Anlagen                                           |       0.8 |
 
 
+## Pensions of Civil Servants and Soldiers (Versorgung)
+
+The Funktionenplan has no single code for pensions. The Versorgung is in the Funktion of the ministry that
+pays it. The script `bundeshaushalt_versorgung.py` therefore uses the Gruppierungsplan (Titel group 43x for
+Versorgungsbezüge, 446 for Beihilfen of Versorgungsempfänger) and some named Titel:
+
+| Kategorie                                                     | Soll 2026 | Soll 2025 | Ist 2025 |
+| ------------------------------------------------------------- | --------: | --------: | -------: |
+| Zuschuss an die Postbeamtenversorgungskasse (Kap. 6002)       |     10.34 |     10.10 |    10.00 |
+| Erstattung an das Bundeseisenbahnvermögen (Kap. 1216)         |      5.63 |      5.52 |     5.37 |
+| Versorgungsbezüge Soldaten, incl. Übergangsgebührnisse (433)  |      5.17 |      4.96 |     5.06 |
+| Versorgungsbezüge Beamte und Richter (432)                    |      4.04 |      4.11 |     4.19 |
+| Zuweisungen an den Versorgungsfonds (Vorsorge)                |      2.64 |      2.38 |     2.44 |
+| Beihilfen für Versorgungsempfänger (446)                      |      1.78 |      1.77 |     1.88 |
+| Zuführung an die Versorgungsrücklage (Vorsorge)               |      0.87 |      0.88 |     0.88 |
+| Sonstige Versorgungsbezüge (431, 437, 439)                    |      0.06 |      0.06 |     0.06 |
+| **Summe**                                                     | **30.53** | **29.79** |**29.88** |
+
+Limits of this estimate:
+
+- Only the Bund. Most Beamte (for example teachers and police) work for the Länder, which pay their own
+  pensions. These are not in the Bundeshaushalt.
+- The Bundeseisenbahnvermögen also pays administration costs, and it has its own revenue. Not all of the
+  Erstattung is for pensions.
+- The Postbeamtenversorgungskasse also gets contributions from Deutsche Post, Telekom and Postbank. The
+  Zuschuss is only the part that the Bund pays.
+- Versorgungsfonds and Versorgungsrücklage are savings for future pensions, not payments to pensioners.
+- The full official numbers are in the Versorgungsbericht der Bundesregierung.
+
+```bash
+python3 research/bundeshaushalt_versorgung.py research/bundeshaushalt/HH_2026_ALL.csv
+```
+
+
 ## Notes
 
 1. The Funktionenplan assigns each Titel to one purpose. Zuweisungen to the social insurance funds (for

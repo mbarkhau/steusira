@@ -19,7 +19,7 @@ Usage: python3 -I research/bundeshaushalt_summary.py research/bundeshaushalt/HH_
 import csv
 import sys
 import xml.etree.ElementTree as ET
-from collections import defaultdict
+from collections import defaultdict, namedtuple
 
 # Hauptfunktionen of the Funktionenplan (first digit of the Funktion)
 HAUPTFUNKTIONEN = {
@@ -34,20 +34,25 @@ HAUPTFUNKTIONEN = {
     "8": "Finanzwirtschaft (u. a. Zinsen der Bundesschuld)",
 }
 
+# One expenditure Titel, with the amount in euro
+Titel = namedtuple("Titel", "epl epl_text kap kap_text titel text funktion euro")
+
 
 def read_csv(path):
-    """Yield (einzelplan, einzelplan text, kapitel, kapitel text, funktion, euro) for each expenditure."""
+    """Yield a Titel for each expenditure."""
     with open(path, encoding="utf-8-sig", newline="") as fobj:
         reader = csv.DictReader(fobj, delimiter=";")
         reader.fieldnames = [name.strip() for name in reader.fieldnames]
         for row in reader:
             if row["einahmen-ausgaben"] == "A":
                 euro = int(row["soll"] or 0) * 1000
-                yield (
+                yield Titel(
                     row["einzelplan"],
                     row["einzelplan-text"],
                     row["kapitel"],
                     row["kapitel-text"],
+                    row["titel"],
+                    row["titel-text"],
                     row["funktion"],
                     euro,
                 )
@@ -69,7 +74,20 @@ def read_xml(path):
             for ausgaben in kap.findall("ausgaben"):
                 for titel in ausgaben.iter("titel"):
                     euro = parse_euro(titel.find("ist").get("wert"))
-                    yield (epl.get("nr"), epl_text, kap.get("nr"), kap_text, titel.get("fkt"), euro)
+                    yield Titel(
+                        epl.get("nr"),
+                        epl_text,
+                        kap.get("nr"),
+                        kap_text,
+                        titel.get("nr"),
+                        titel.findtext("text"),
+                        titel.get("fkt"),
+                        euro,
+                    )
+
+
+def read_titel(path):
+    return read_xml(path) if path.endswith(".xml") else read_csv(path)
 
 
 def print_table(title, totals, labels):
@@ -84,12 +102,11 @@ def print_table(title, totals, labels):
 
 
 def main(path):
-    rows = read_xml(path) if path.endswith(".xml") else read_csv(path)
     by_epl = defaultdict(float)
     by_func = defaultdict(float)
     by_anlage = defaultdict(float)
     labels = {}
-    for epl, epl_text, kap, kap_text, funktion, euro in rows:
+    for epl, epl_text, kap, kap_text, _, _, funktion, euro in read_titel(path):
         if kap[2:] >= "90":
             by_anlage[kap] += euro
             labels[kap] = kap_text.replace('"', "")
