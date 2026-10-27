@@ -3,7 +3,8 @@
 Status: research notes, collected 2026-10-27.
 
 This file lists the legal values that `public/steuern.js` uses, with the sources. All values apply to the
-calendar year 2026, unless the note says otherwise.
+calendar year 2026, unless the note says otherwise. The section [Other Years](#other-years) lists the values
+that differ in 2024, 2025 and 2027.
 
 
 ## Income Tax and Surcharges
@@ -63,6 +64,52 @@ calendar year 2026, unless the note says otherwise.
   including business property. The calculator uses 300 € per household as the default. Source: [22].
 
 
+## Other Years
+
+Status: collected 2026-10-27. The calculator supports the years 2024 to 2027. Values that are not in this
+table are the same as in 2026.
+
+| Parameter                         | 2024                         | 2025                    | 2027 (draft)                  |
+| --------------------------------- | ---------------------------- | ----------------------- | ----------------------------- |
+| Grundfreibetrag                   | 11,784 €                     | 12,096 €                | 12,564 €                      |
+| Zone 2: end, coefficient          | 17,005 €, 954.80             | 17,443 €, 932.30        | 17,799 €, 952.24              |
+| Zone 3: end, coefficient, const.  | 66,760 €, 181.19, 991.21     | 68,480 €, 176.64, 1,015.13 | 70,600 €, 170.74, 993.86   |
+| Zone 4 (42 %)                     | 0.42·x − 10,636.31           | 0.42·x − 10,911.92      | 0.42·x − 11,241.73, to 249,999 € |
+| Zone 5 (45 %)                     | 0.45·x − 18,971.06           | 0.45·x − 19,246.67      | 0.45·x − 18,741.70, to 279,999 € |
+| Zone 6 (47 %)                     | –                            | –                       | 0.47·x − 24,341.68            |
+| Kinderfreibetrag + BEA            | 9,540 €                      | 9,600 €                 | 10,056 €                      |
+| Kindergeld per month              | 250 €                        | 255 €                   | 267 €                         |
+| Arbeitnehmer-Pauschbetrag         | 1,230 €                      | 1,230 €                 | 1,430 €                       |
+| Soli Freigrenze (single)          | 18,130 €                     | 19,950 €                | 20,350 € (assumption)         |
+| BBG RV/AV                         | 90,600 € (West)              | 96,600 €                | 106,200 €                     |
+| BBG KV/PV                         | 62,100 €                     | 66,150 €                | 76,500 €                      |
+| Average KV Zusatzbeitrag          | 1.7 %                        | 2.5 %                   | 2.9 % (estimate)              |
+| Pflegeversicherung                | 3.4 %                        | 3.6 %                   | 3.6 % (assumption)            |
+| USt on restaurant food            | 19 %                         | 19 %                    | 7 %                           |
+| Cigarettes: ct/piece, %, min. ct  | 11.15, 19.84 %, 22.888       | 11.71, 19.84 %, 24.163  | 14.34, 21.05 %, 29.492        |
+| Feinschnitt: €/kg, %, min. €/kg   | 54.39, 17.00 %, 111.78       | 57.85, 17.20 %, 121.51  | 75.80, 17.97 %, 151.34 (est.) |
+| CO₂ price (default)               | 45 €/t fixed                 | 55 €/t fixed            | 60 €/t, corridor 55 to 65     |
+| Luftverkehrsteuer                 | 15.53 / 39.34 / 70.83 €      | 15.53 / 39.34 / 70.83 € | 13.03 / 33.01 / 59.43 €       |
+
+Notes:
+
+- 2024: The Grundfreibetrag and the Kinderfreibetrag were raised retroactively by the
+  Steuerfortentwicklungsgesetz in December 2024. The table uses these final values. The BBG RV uses the West
+  value; East was 89,400 €. The Luftverkehrsteuer rose on 2024-05-01 (before: 12.73 / 32.25 / 58.06 €); the
+  calculator uses the higher rate.
+- 2027: Most values are drafts, status 2026-10-27. The tariff and the child values come from the government
+  draft of the Einkommensteuerreformgesetz 2027 (BT-Drucksache 21/8235) [23, 24, 25]. The tariff is
+  continuous at all zone limits; this was checked in `test/steuern.test.js`. The BBG values come from the
+  Sozialversicherungsrechengrößen-Verordnung 2027, cabinet decision of 2026-10-07; the Bundesrat must still
+  agree [26]. The Bundesrat approved the Tabaksteuer increase on 2026-10-16 [27]. The CO₂ corridor 55 to 65
+  €/t for 2027 is in the draft of the third BEHG amendment [28]. The Schätzerkreis estimate for the average
+  Zusatzbeitrag 2027 is 2.9 % [29].
+- 2027 open values: No source gives the Soli Freigrenze 2027; the calculator keeps 20,350 €. No source gives
+  the Mindeststeuer for Feinschnitt 2027; the calculator raises the 2026 value by the same factor as the
+  Mindeststeuer for cigarettes (29.492 / 25.106). The Pflegeversicherung rate stays at 3.6 %.
+- Tabaksteuer 2022 to 2026: [11] lists all steps of §2 TabStG.
+
+
 ## Sources
 
 1. https://www.gesetze-im-internet.de/estg/__32a.html
@@ -88,3 +135,10 @@ calendar year 2026, unless the note says otherwise.
 20. https://ema-energiewelt.de/wissen/co2-preis-2026-versteigerung-eex-heizkosten
 21. https://finanztip.de/rundfunkbeitrag/
 22. https://www.destatis.de/DE/Presse/Pressemitteilungen/2026/10/PD26_369_712.html
+23. https://www.bundesregierung.de/breg-de/aktuelles/einkommensteuerreform-2027-2451192
+24. https://www.deutschland-rechner.de/einkommensteuer-rechner (tariff formulas of the draft 2027)
+25. https://www.finanz.de/steuern/steuerreform-2027/
+26. https://www.bmas.de/DE/Service/Presse/Pressemitteilungen/2026/bundeskabinett-beschliesst-sozialversicherungsrechengroessen-2027.html
+27. https://www.netz-trends.de/tabaksteuer-bundesrat-billigt-erhoehung-2027-2030-14-34-cent-zigarette-16-oktober-2026/
+28. https://www.advant-beiten.com/aktuelles/behg-novelle-co2-preis-bleibt-2027-im-korridor-von-55-bis-65-euro
+29. https://www.apotheken-umschau.de/gesundheitspolitik/zusatzbeitrag-2027-bleibt-bei-2-9-prozent-doch-kassen-warnen-1605019.html

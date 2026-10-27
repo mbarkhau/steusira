@@ -27,6 +27,8 @@
           <p class="kpi-sub" id="quote"></p>
         </div>
         <p class="tage" id="tage"></p>
+        <p class="entwurf" id="entwurf" hidden>Die Werte für 2027 stammen zum Teil aus Gesetzentwürfen (Stand
+          27. Oktober 2026). Sie können sich bis zum Inkrafttreten noch ändern.</p>
 
         <div class="tabs" role="tablist">
           <button type="button" role="tab" aria-selected="true" data-ansicht="art">Nach Steuerart</button>
@@ -41,13 +43,15 @@
         <details class="hinweise">
           <summary>Annahmen und Grenzen</summary>
           <ul>
-            <li>Rechtsstand 2026. Einkommensteuer nach Jahresveranlagung, nicht nach Lohnsteuerabzug.</li>
+            <li><span id="rechtsstand">Rechtsstand 2026.</span> Einkommensteuer nach Jahresveranlagung, nicht
+              nach Lohnsteuerabzug.</li>
             <li>Nur Arbeitnehmer mit gesetzlicher Krankenversicherung. Minijobs, Midijobs, Beamte,
               Selbständige und Privatversicherte rechnet der Rechner nicht korrekt.</li>
-            <li>Abzüge: Werbungskosten (mindestens 1.230 €), Vorsorgeaufwendungen und Sonderausgaben-Pauschbetrag.
-              Kinderfreibetrag voll (9.756 € je Kind) mit Günstigerprüfung gegen das Kindergeld.</li>
+            <li>Abzüge: Werbungskosten (mindestens <span id="abzug-pausch">1.230</span> €), Vorsorgeaufwendungen
+              und Sonderausgaben-Pauschbetrag. Kinderfreibetrag voll (<span id="abzug-kfb">9.756</span> € je Kind)
+              mit Günstigerprüfung gegen das Kindergeld.</li>
             <li>Bei Verheirateten gilt Zusammenveranlagung. Alle Ausgaben sind dann Ausgaben des Haushalts.</li>
-            <li>Gastronomie: 70 % Speisen (7 %) und 30 % Getränke (19 %). Bier mit 11,5 °Plato. Spirituosen mit
+            <li>Gastronomie: 70 % Speisen (<span id="gastro-satz">7 %</span>) und 30 % Getränke (19 %). Bier mit 11,5 °Plato. Spirituosen mit
               40 % vol. Zigarettenschachtel mit 20 Stück, Tabakbeutel mit 40 g.</li>
             <li>Nicht enthalten sind Steuern, die Unternehmen tragen und über die Preise weitergeben, zum Beispiel
               Gewerbe- und Körperschaftsteuer, sowie die Umlagen der Arbeitgeber (U1, U2, Unfallversicherung).</li>
@@ -61,7 +65,7 @@
   </main>
   <div class="leiste" id="leiste" aria-hidden="true"></div>
   <footer>
-    <p>&copy; <span id="year">2026</span> mbarkhau · Version 2026.10001</p>
+    <p>&copy; <span id="year">2026</span> mbarkhau · Version 2026.10002</p>
   </footer>
   <script>document.getElementById("year").textContent = new Date().getFullYear();</script>
 </body>

@@ -286,3 +286,35 @@ select {
   }
   footer { padding-bottom: 4rem; }
 }
+
+/* Wahl des Steuerjahres */
+.jahrwahl { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 0.75rem; }
+.jahrwahl > span { font-size: 0.9375rem; font-weight: 500; }
+.jahre {
+  display: flex;
+  flex-wrap: wrap;
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  background: var(--surface);
+  overflow: hidden;
+}
+.jahre label { position: relative; cursor: pointer; }
+.jahre label + label { border-left: 1px solid var(--border); }
+.jahre input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
+.jahre span {
+  display: block;
+  padding: 0.375rem 0.75rem;
+  color: var(--muted);
+  font-size: 0.9375rem;
+  font-variant-numeric: tabular-nums;
+}
+.jahre input:checked + span { background: var(--accent); color: var(--surface); }
+.jahre input:focus-visible + span { outline: 2px solid var(--fg); outline-offset: -4px; }
+.entwurf {
+  margin: 0.5rem 0 0;
+  padding: 0.5rem 0.75rem;
+  border-left: 3px solid var(--g-konsum);
+  color: var(--muted);
+  font-size: 0.875rem;
+}
+.entwurf[hidden] { display: none; }

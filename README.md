@@ -12,7 +12,7 @@ gesamte Belastung, die sich aus der individuellen Situation ergibt.
 
 Das Projekt ist in einer frühen Phase. Die Website unter
 [steusira.mbarkhau.workers.dev](https://steusira.mbarkhau.workers.dev) enthält einen ersten Steuerrechner
-(Rechtsstand 2026). Er addiert die Steuern auf das Einkommen, die Sozialabgaben und die Steuern auf Konsum,
+für die Steuerjahre 2024 bis 2027 (2027 nach Gesetzentwürfen). Er addiert die Steuern auf das Einkommen, die Sozialabgaben und die Steuern auf Konsum,
 zum Beispiel Umsatzsteuer, Energiesteuer, Tabaksteuer und Alkoholsteuer. Die Parameter und Quellen stehen in
 [research/steuerrechner-parameter-2026.md](research/steuerrechner-parameter-2026.md).
 

@@ -1,12 +1,15 @@
 // Rechenlogik für die gesamte Steuer- und Abgabenbelastung eines Haushalts.
-// Alle Beträge in Euro pro Jahr. Rechtsstand: Kalenderjahr 2026.
+// Alle Beträge in Euro pro Jahr. Rechtsstand: Kalenderjahre 2024 bis 2027.
 // Quellen: research/steuerrechner-parameter-2026.md
 
-export const P = {
-  jahr: 2026,
-
+const BASIS = {
   // Einkommensteuer (§32a EStG, ab VZ 2026)
   grundfreibetrag: 12348,
+  tarif: {
+    zone2: { bis: 17799, a: 914.51 },
+    zone3: { bis: 69878, a: 173.1, c: 1034.87 },
+    linear: [[277825, 0.42, 11135.63], [Infinity, 0.45, 19470.38]],
+  },
   werbungskostenPausch: 1230,
   sonderausgabenPausch: 36,
   sparerPausch: 1000,
@@ -34,7 +37,8 @@ export const P = {
   // Umsatzsteuer
   ust: 0.19,
   ustErm: 0.07,
-  gastroSpeisenAnteil: 0.7, // Speisen 7 %, Getränke 19 %
+  ustGastroSpeisen: 0.07, // ab 1.1.2026, vorher 19 %
+  gastroSpeisenAnteil: 0.7, // Rest sind Getränke mit 19 %
 
   // Energie (Energiesteuer, Stromsteuer, CO2-Preis nach BEHG)
   stromsteuerKwh: 0.0205,
@@ -46,6 +50,8 @@ export const P = {
   co2DieselKgL: 2.65,
   co2HeizoelKgL: 2.676,
   co2GasKgKwh: 0.182,
+  co2Preis: 60, // Vorgabe für das Eingabefeld
+  co2Hinweis: "Preiskorridor 2026: 55 bis 65 €/t",
 
   // Tabaksteuer, Stufe 1.1.2026 bis 14.2.2027 (§2 TabStG)
   zigaretteStueck: 0.1228,
@@ -70,57 +76,143 @@ export const P = {
   rundfunkMonat: 18.36,
 };
 
+// Abweichungen der einzelnen Jahre von BASIS (Rechtsstand 2026).
+const JAHRE_ABWEICHUNG = {
+  2024: {
+    // Grundfreibetrag und Kinderfreibetrag rückwirkend erhöht (Steuerfortentwicklungsgesetz)
+    grundfreibetrag: 11784,
+    tarif: {
+      zone2: { bis: 17005, a: 954.8 },
+      zone3: { bis: 66760, a: 181.19, c: 991.21 },
+      linear: [[277825, 0.42, 10636.31], [Infinity, 0.45, 18971.06]],
+    },
+    kinderFreibetrag: 9540, // 6.612 + 2.928
+    kindergeldMonat: 250,
+    soliFreigrenze: 18130,
+    bbgRv: 90600, // West; Ost 89.400
+    bbgKv: 62100,
+    kvZusatz: 0.017,
+    pv: 0.034,
+    ustGastroSpeisen: 0.19,
+    co2Preis: 45,
+    co2Hinweis: "Festpreis 2024: 45 €/t",
+    zigaretteStueck: 0.1115,
+    zigaretteMinStueck: 0.22888,
+    feinschnittKg: 54.39,
+    feinschnittWert: 0.17,
+    feinschnittMinKg: 111.78,
+    luftverkehr: { kurz: 15.53, mittel: 39.34, lang: 70.83 }, // ab 1.5.2024
+  },
+  2025: {
+    grundfreibetrag: 12096,
+    tarif: {
+      zone2: { bis: 17443, a: 932.3 },
+      zone3: { bis: 68480, a: 176.64, c: 1015.13 },
+      linear: [[277825, 0.42, 10911.92], [Infinity, 0.45, 19246.67]],
+    },
+    kinderFreibetrag: 9600, // 6.672 + 2.928
+    kindergeldMonat: 255,
+    soliFreigrenze: 19950,
+    bbgRv: 96600,
+    bbgKv: 66150,
+    kvZusatz: 0.025,
+    ustGastroSpeisen: 0.19,
+    co2Preis: 55,
+    co2Hinweis: "Festpreis 2025: 55 €/t",
+    zigaretteStueck: 0.1171,
+    zigaretteMinStueck: 0.24163,
+    feinschnittKg: 57.85,
+    feinschnittWert: 0.172,
+    feinschnittMinKg: 121.51,
+    luftverkehr: { kurz: 15.53, mittel: 39.34, lang: 70.83 },
+  },
+  2026: {},
+  2027: {
+    // Entwurf Einkommensteuerreformgesetz 2027 (BT-Drs. 21/8235), noch nicht verkündet
+    entwurf: true,
+    grundfreibetrag: 12564,
+    tarif: {
+      zone2: { bis: 17799, a: 952.24 },
+      zone3: { bis: 70600, a: 170.74, c: 993.86 },
+      linear: [[249999, 0.42, 11241.73], [279999, 0.45, 18741.7], [Infinity, 0.47, 24341.68]],
+    },
+    werbungskostenPausch: 1430,
+    kinderFreibetrag: 10056,
+    kindergeldMonat: 267,
+    // Soli-Freigrenze 2027: kein Wert gefunden, Annahme wie 2026
+    bbgRv: 106200, // SV-Rechengrößenverordnung 2027, Kabinett 7.10.2026
+    bbgKv: 76500,
+    co2Hinweis: "Preiskorridor 2027 (Entwurf): 55 bis 65 €/t",
+    // Tabaksteuermodernisierung, ab 1.1.2027
+    zigaretteStueck: 0.1434,
+    zigaretteWert: 0.2105,
+    zigaretteMinStueck: 0.29492,
+    feinschnittKg: 75.8,
+    feinschnittWert: 0.1797,
+    feinschnittMinKg: 151.34, // Schätzung: Anstieg wie bei Zigaretten (+17,5 %)
+  },
+};
+
+export const JAHRE = Object.keys(JAHRE_ABWEICHUNG).map(Number);
+
+export const PARAMETER = Object.fromEntries(JAHRE.map((jahr) =>
+  [jahr, { ...BASIS, entwurf: false, ...JAHRE_ABWEICHUNG[jahr], jahr }]));
+
+export const P = PARAMETER[2026];
+
+export const parameter = (jahr) => PARAMETER[jahr] || P;
+
 const runde = (x) => Math.round(x * 100) / 100;
 const ust = (brutto, satz) => (brutto * satz) / (1 + satz);
 
-export function tarif(zvE) {
+export function tarif(zvE, p = P) {
   const x = Math.floor(Math.max(0, zvE));
+  const { zone2, zone3, linear } = p.tarif;
   let st;
-  if (x <= P.grundfreibetrag) {
+  if (x <= p.grundfreibetrag) {
     st = 0;
-  } else if (x <= 17799) {
-    const y = (x - P.grundfreibetrag) / 1e4;
-    st = (914.51 * y + 1400) * y;
-  } else if (x <= 69878) {
-    const z = (x - 17799) / 1e4;
-    st = (173.1 * z + 2397) * z + 1034.87;
-  } else if (x <= 277825) {
-    st = 0.42 * x - 11135.63;
+  } else if (x <= zone2.bis) {
+    const y = (x - p.grundfreibetrag) / 1e4;
+    st = (zone2.a * y + 1400) * y;
+  } else if (x <= zone3.bis) {
+    const z = (x - zone2.bis) / 1e4;
+    st = (zone3.a * z + 2397) * z + zone3.c;
   } else {
-    st = 0.45 * x - 19470.38;
+    const [, satz, abzug] = linear.find(([bis]) => x <= bis);
+    st = satz * x - abzug;
   }
   return Math.floor(st);
 }
 
-export function einkommensteuer(zvE, splitting) {
-  return splitting ? 2 * tarif(zvE / 2) : tarif(zvE);
+export function einkommensteuer(zvE, splitting, p = P) {
+  return splitting ? 2 * tarif(zvE / 2, p) : tarif(zvE, p);
 }
 
-export function soli(est, splitting) {
-  const freigrenze = P.soliFreigrenze * (splitting ? 2 : 1);
+export function soli(est, splitting, p = P) {
+  const freigrenze = p.soliFreigrenze * (splitting ? 2 : 1);
   if (est <= freigrenze) return 0;
-  return runde(Math.min(P.soliSatz * est, P.soliMilderung * (est - freigrenze)));
+  return runde(Math.min(p.soliSatz * est, p.soliMilderung * (est - freigrenze)));
 }
 
 // Anteile von Arbeitnehmer (an) und Arbeitgeber (ag), gesetzlich versichert.
-export function sozialabgaben(brutto, { kinder = 0, kvZusatz = P.kvZusatz } = {}) {
-  const rvBasis = Math.min(brutto, P.bbgRv);
-  const kvBasis = Math.min(brutto, P.bbgKv);
-  const kvHalb = (P.kv + kvZusatz) / 2;
-  const kinderAbschlag = P.pvKinderAbschlag * Math.max(0, Math.min(kinder, 5) - 1);
-  const pvAn = P.pv / 2 + (kinder === 0 ? P.pvKinderlos : 0) - kinderAbschlag;
+export function sozialabgaben(brutto, { kinder = 0, p = P, kvZusatz = p.kvZusatz } = {}) {
+  const rvBasis = Math.min(brutto, p.bbgRv);
+  const kvBasis = Math.min(brutto, p.bbgKv);
+  const kvHalb = (p.kv + kvZusatz) / 2;
+  const kinderAbschlag = p.pvKinderAbschlag * Math.max(0, Math.min(kinder, 5) - 1);
+  const pvAn = p.pv / 2 + (kinder === 0 ? p.pvKinderlos : 0) - kinderAbschlag;
   return {
     an: {
-      rv: runde((rvBasis * P.rv) / 2),
-      av: runde((rvBasis * P.av) / 2),
+      rv: runde((rvBasis * p.rv) / 2),
+      av: runde((rvBasis * p.av) / 2),
       kv: runde(kvBasis * kvHalb),
       pv: runde(kvBasis * pvAn),
     },
     ag: {
-      rv: runde((rvBasis * P.rv) / 2),
-      av: runde((rvBasis * P.av) / 2),
+      rv: runde((rvBasis * p.rv) / 2),
+      av: runde((rvBasis * p.av) / 2),
       kv: runde(kvBasis * kvHalb),
-      pv: runde((kvBasis * P.pv) / 2),
+      pv: runde((kvBasis * p.pv) / 2),
     },
   };
 }
@@ -134,6 +226,7 @@ function vorsorge(an) {
 const summe = (obj) => Object.values(obj).reduce((a, b) => a + b, 0);
 
 export const STANDARD = {
+  jahr: 2026,
   brutto: 50000,
   verheiratet: false,
   bruttoPartner: 0,
@@ -189,9 +282,17 @@ export const STANDARD = {
   rundfunk: true,
 };
 
+// Vorgaben für ein Jahr: Zusatzbeitrag und CO₂-Preis hängen vom Jahr ab.
+export function standard(jahr = STANDARD.jahr) {
+  const p = parameter(jahr);
+  return { ...STANDARD, jahr: p.jahr, kvZusatz: runde(p.kvZusatz * 100), co2Preis: p.co2Preis };
+}
+
 // Gruppen: einkommen, sozial, arbeitgeber, konsum, abgabe, transfer
 export function berechne(eingabe) {
-  const e = { ...STANDARD, ...eingabe };
+  const e = { ...standard(eingabe.jahr), ...eingabe };
+  const p = parameter(e.jahr);
+  e.jahr = p.jahr;
   const posten = [];
   const ausgaben = {}; // Konsumausgaben je Bereich
   const add = (gruppe, art, bereich, betrag) => {
@@ -211,33 +312,33 @@ export function berechne(eingabe) {
   let vorsorgeAbzug = 0;
   for (const v of verdiener) {
     if (v.brutto <= 0) continue;
-    const s = sozialabgaben(v.brutto, { kinder: e.kinder, kvZusatz: e.kvZusatz / 100 });
+    const s = sozialabgaben(v.brutto, { kinder: e.kinder, kvZusatz: e.kvZusatz / 100, p });
     for (const k of Object.keys(s.an)) {
       sv.an[k] += s.an[k];
       sv.ag[k] += s.ag[k];
     }
-    einkuenfte += Math.max(0, v.brutto - Math.max(P.werbungskostenPausch, v.wk));
+    einkuenfte += Math.max(0, v.brutto - Math.max(p.werbungskostenPausch, v.wk));
     vorsorgeAbzug += vorsorge(s.an);
   }
-  const sonderausgaben = P.sonderausgabenPausch * (splitting ? 2 : 1);
+  const sonderausgaben = p.sonderausgabenPausch * (splitting ? 2 : 1);
   const zvE = Math.max(0, Math.floor(einkuenfte - vorsorgeAbzug - sonderausgaben));
 
   // Günstigerprüfung Kindergeld gegen Kinderfreibetrag (§31 EStG)
-  const kindergeld = e.kinder * P.kindergeldMonat * 12;
-  const estOhneKfb = einkommensteuer(zvE, splitting);
-  const estMitKfb = einkommensteuer(Math.max(0, zvE - e.kinder * P.kinderFreibetrag), splitting);
+  const kindergeld = e.kinder * p.kindergeldMonat * 12;
+  const estOhneKfb = einkommensteuer(zvE, splitting, p);
+  const estMitKfb = einkommensteuer(Math.max(0, zvE - e.kinder * p.kinderFreibetrag), splitting, p);
   const freibetragGuenstiger = estOhneKfb - estMitKfb > kindergeld;
   const est = freibetragGuenstiger ? estMitKfb + kindergeld : estOhneKfb;
 
   add("einkommen", "Einkommensteuer", "Einkommen", est);
-  add("einkommen", "Solidaritätszuschlag", "Einkommen", soli(estMitKfb, splitting));
+  add("einkommen", "Solidaritätszuschlag", "Einkommen", soli(estMitKfb, splitting, p));
   add("einkommen", "Kirchensteuer", "Einkommen", estMitKfb * e.kirche);
 
   // Abgeltungsteuer mit Kirchensteuerabzug (§32d Abs. 1 EStG)
-  const kapPflichtig = Math.max(0, e.kapital - P.sparerPausch * (splitting ? 2 : 1));
+  const kapPflichtig = Math.max(0, e.kapital - p.sparerPausch * (splitting ? 2 : 1));
   const abgeltung = kapPflichtig / (4 + e.kirche);
   add("einkommen", "Abgeltungsteuer", "Einkommen", abgeltung);
-  add("einkommen", "Solidaritätszuschlag", "Einkommen", abgeltung * P.soliSatz);
+  add("einkommen", "Solidaritätszuschlag", "Einkommen", abgeltung * p.soliSatz);
   add("einkommen", "Kirchensteuer", "Einkommen", abgeltung * e.kirche);
 
   add("sozial", "Rentenversicherung", "Einkommen", sv.an.rv);
@@ -249,16 +350,16 @@ export function berechne(eingabe) {
   // --- Konsum ---
   const ernaehrung = "Ernährung";
   ausgabe(ernaehrung, (e.lebensmittel + e.getraenke + e.gastro) * 12);
-  add("konsum", "Umsatzsteuer", ernaehrung, ust(e.lebensmittel * 12, P.ustErm));
-  add("konsum", "Umsatzsteuer", ernaehrung, ust(e.getraenke * 12, P.ust));
+  add("konsum", "Umsatzsteuer", ernaehrung, ust(e.lebensmittel * 12, p.ustErm));
+  add("konsum", "Umsatzsteuer", ernaehrung, ust(e.getraenke * 12, p.ust));
   const gastroJahr = e.gastro * 12;
-  add("konsum", "Umsatzsteuer", ernaehrung, ust(gastroJahr * P.gastroSpeisenAnteil, P.ustErm));
-  add("konsum", "Umsatzsteuer", ernaehrung, ust(gastroJahr * (1 - P.gastroSpeisenAnteil), P.ust));
+  add("konsum", "Umsatzsteuer", ernaehrung, ust(gastroJahr * p.gastroSpeisenAnteil, p.ustGastroSpeisen));
+  add("konsum", "Umsatzsteuer", ernaehrung, ust(gastroJahr * (1 - p.gastroSpeisenAnteil), p.ust));
 
   const alltag = "Konsum";
   ausgabe(alltag, (e.konsum19 + e.konsum7) * 12);
-  add("konsum", "Umsatzsteuer", alltag, ust(e.konsum19 * 12, P.ust));
-  add("konsum", "Umsatzsteuer", alltag, ust(e.konsum7 * 12, P.ustErm));
+  add("konsum", "Umsatzsteuer", alltag, ust(e.konsum19 * 12, p.ust));
+  add("konsum", "Umsatzsteuer", alltag, ust(e.konsum7 * 12, p.ustErm));
 
   // Wohnen und Energie
   const wohnen = "Wohnen und Energie";
@@ -268,22 +369,22 @@ export function berechne(eingabe) {
   const heizoel = e.heizoelL * e.heizoelPreis;
   ausgabe(wohnen, strom + gas + heizoel + e.grundsteuer);
   add("konsum", "Grundsteuer", wohnen, e.grundsteuer);
-  add("konsum", "Stromsteuer", wohnen, e.stromKwh * P.stromsteuerKwh);
-  add("konsum", "Umsatzsteuer", wohnen, ust(strom + gas + heizoel, P.ust));
-  add("konsum", "Energiesteuer", wohnen, e.gasKwh * P.energieGasKwh + e.heizoelL * P.energieHeizoelL);
-  add("abgabe", "CO₂-Preis", wohnen, co2(e.gasKwh * P.co2GasKgKwh + e.heizoelL * P.co2HeizoelKgL));
+  add("konsum", "Stromsteuer", wohnen, e.stromKwh * p.stromsteuerKwh);
+  add("konsum", "Umsatzsteuer", wohnen, ust(strom + gas + heizoel, p.ust));
+  add("konsum", "Energiesteuer", wohnen, e.gasKwh * p.energieGasKwh + e.heizoelL * p.energieHeizoelL);
+  add("abgabe", "CO₂-Preis", wohnen, co2(e.gasKwh * p.co2GasKgKwh + e.heizoelL * p.co2HeizoelKgL));
 
   // Mobilität
   const mobil = "Mobilität";
   const benzinL = e.benzinL * 12;
   const dieselL = e.dieselL * 12;
   const kraftstoff = benzinL * e.benzinPreis + dieselL * e.dieselPreis;
-  const fluege = e.fluegeKurz * P.luftverkehr.kurz + e.fluegeMittel * P.luftverkehr.mittel
-    + e.fluegeLang * P.luftverkehr.lang;
+  const fluege = e.fluegeKurz * p.luftverkehr.kurz + e.fluegeMittel * p.luftverkehr.mittel
+    + e.fluegeLang * p.luftverkehr.lang;
   ausgabe(mobil, kraftstoff + e.kfzSteuer);
-  add("konsum", "Energiesteuer", mobil, benzinL * P.energieBenzinL + dieselL * P.energieDieselL);
-  add("konsum", "Umsatzsteuer", mobil, ust(kraftstoff, P.ust));
-  add("abgabe", "CO₂-Preis", mobil, co2(benzinL * P.co2BenzinKgL + dieselL * P.co2DieselKgL));
+  add("konsum", "Energiesteuer", mobil, benzinL * p.energieBenzinL + dieselL * p.energieDieselL);
+  add("konsum", "Umsatzsteuer", mobil, ust(kraftstoff, p.ust));
+  add("abgabe", "CO₂-Preis", mobil, co2(benzinL * p.co2BenzinKgL + dieselL * p.co2DieselKgL));
   add("konsum", "Kraftfahrzeugsteuer", mobil, e.kfzSteuer);
   add("konsum", "Luftverkehrsteuer", mobil, fluege);
 
@@ -292,10 +393,10 @@ export function berechne(eingabe) {
   const schachteln = e.zigaretten * 52;
   const beutel = (e.tabakG * 52) / 40;
   ausgabe(rauchen, schachteln * e.zigarettenPreis + beutel * e.tabakPreis);
-  add("konsum", "Tabaksteuer", rauchen, schachteln * tabakSchachtel(e.zigarettenPreis)
-    + beutel * tabakBeutel(e.tabakPreis));
+  add("konsum", "Tabaksteuer", rauchen, schachteln * tabakSchachtel(e.zigarettenPreis, p)
+    + beutel * tabakBeutel(e.tabakPreis, p));
   add("konsum", "Umsatzsteuer", rauchen,
-    ust(schachteln * e.zigarettenPreis + beutel * e.tabakPreis, P.ust));
+    ust(schachteln * e.zigarettenPreis + beutel * e.tabakPreis, p.ust));
 
   // Alkohol: Bier in Litern pro Woche, sonst Flaschen pro Monat
   const alkohol = "Alkohol";
@@ -303,27 +404,27 @@ export function berechne(eingabe) {
   const alkoholAusgaben = bierL * e.bierPreis
     + 12 * (e.wein * e.weinPreis + e.sekt * e.sektPreis + e.spirituosen * e.spirituosenPreis);
   ausgabe(alkohol, alkoholAusgaben);
-  add("konsum", "Biersteuer", alkohol, bierL * (P.bierHlPlato * P.bierPlato) / 100);
-  add("konsum", "Schaumweinsteuer", alkohol, e.sekt * 12 * P.schaumweinFlasche);
+  add("konsum", "Biersteuer", alkohol, bierL * (p.bierHlPlato * p.bierPlato) / 100);
+  add("konsum", "Schaumweinsteuer", alkohol, e.sekt * 12 * p.schaumweinFlasche);
   add("konsum", "Alkoholsteuer", alkohol,
-    e.spirituosen * 12 * P.spirituosenLiter * P.spirituosenVol * (P.alkoholHlA / 100));
-  add("konsum", "Umsatzsteuer", alkohol, ust(alkoholAusgaben, P.ust));
+    e.spirituosen * 12 * p.spirituosenLiter * p.spirituosenVol * (p.alkoholHlA / 100));
+  add("konsum", "Umsatzsteuer", alkohol, ust(alkoholAusgaben, p.ust));
 
   // Kaffee: Ausgaben sind in den Lebensmitteln enthalten
-  add("konsum", "Kaffeesteuer", ernaehrung, e.kaffee * 12 * P.kaffeeKg);
+  add("konsum", "Kaffeesteuer", ernaehrung, e.kaffee * 12 * p.kaffeeKg);
 
   // Sonstiges
   const sonst = "Sonstiges";
-  ausgabe(sonst, e.versicherungen + e.lotto * 12 + e.hundesteuer + (e.rundfunk ? P.rundfunkMonat * 12 : 0));
-  add("konsum", "Versicherungsteuer", sonst, ust(e.versicherungen, P.versicherungsteuer));
-  add("konsum", "Lotteriesteuer", sonst, ust(e.lotto * 12, P.lotteriesteuer));
+  ausgabe(sonst, e.versicherungen + e.lotto * 12 + e.hundesteuer + (e.rundfunk ? p.rundfunkMonat * 12 : 0));
+  add("konsum", "Versicherungsteuer", sonst, ust(e.versicherungen, p.versicherungsteuer));
+  add("konsum", "Lotteriesteuer", sonst, ust(e.lotto * 12, p.lotteriesteuer));
   add("konsum", "Hundesteuer", sonst, e.hundesteuer);
-  if (e.rundfunk) add("abgabe", "Rundfunkbeitrag", sonst, P.rundfunkMonat * 12);
+  if (e.rundfunk) add("abgabe", "Rundfunkbeitrag", sonst, p.rundfunkMonat * 12);
 
   // --- Summen ---
   const gruppen = { einkommen: 0, sozial: 0, arbeitgeber: 0, konsum: 0, abgabe: 0 };
   const aktiv = posten.filter((p) => p.gruppe !== "abgabe" || e.abgaben);
-  for (const p of aktiv) gruppen[p.gruppe] += p.betrag;
+  for (const x of aktiv) gruppen[x.gruppe] += x.betrag;
 
   const brutto = e.brutto + (splitting ? e.bruttoPartner : 0);
   const einkommen = brutto + e.kapital + gruppen.arbeitgeber;
@@ -334,6 +435,8 @@ export function berechne(eingabe) {
 
   return {
     eingabe: e,
+    jahr: e.jahr,
+    parameter: p,
     posten: aktiv,
     ausgaben,
     gruppen: Object.fromEntries(Object.entries(gruppen).map(([k, v]) => [k, runde(v)])),
@@ -352,15 +455,15 @@ export function berechne(eingabe) {
   };
 }
 
-export function tabakSchachtel(preis, stueck = 20) {
-  const nachWert = stueck * P.zigaretteStueck + P.zigaretteWert * preis;
-  const mindest = stueck * P.zigaretteMinStueck - ust(preis, P.ust);
+export function tabakSchachtel(preis, p = P, stueck = 20) {
+  const nachWert = stueck * p.zigaretteStueck + p.zigaretteWert * preis;
+  const mindest = stueck * p.zigaretteMinStueck - ust(preis, p.ust);
   return Math.max(nachWert, mindest);
 }
 
-export function tabakBeutel(preis, gramm = 40) {
+export function tabakBeutel(preis, p = P, gramm = 40) {
   const kg = gramm / 1000;
-  const nachWert = kg * P.feinschnittKg + P.feinschnittWert * preis;
-  const mindest = kg * P.feinschnittMinKg - ust(preis, P.ust);
+  const nachWert = kg * p.feinschnittKg + p.feinschnittWert * preis;
+  const mindest = kg * p.feinschnittMinKg - ust(preis, p.ust);
   return Math.max(nachWert, mindest);
 }

@@ -1,9 +1,11 @@
-import { berechne, STANDARD, P } from "./steuern.js";
+import { berechne, JAHRE, parameter, standard, STANDARD } from "./steuern.js";
 
 const euro = new Intl.NumberFormat("de-DE", { maximumFractionDigits: 0 });
 const prozent = new Intl.NumberFormat("de-DE", { style: "percent", maximumFractionDigits: 1 });
 const datum = new Intl.DateTimeFormat("de-DE", { day: "numeric", month: "long" });
 const komma = (x) => String(x).replace(".", ",");
+const tausend = (x) => euro.format(x);
+const satz = (x) => `${komma(Math.round(x * 1000) / 10)} %`;
 
 const GRUPPEN = {
   einkommen: "Steuern auf Einkommen",
@@ -28,9 +30,9 @@ const ABSCHNITTE = [
         [0, "keine"], [0.08, "8 % (Bayern, Baden-Württemberg)"], [0.09, "9 % (andere Bundesländer)"],
       ] },
       { id: "kvZusatz", label: "Zusatzbeitrag Krankenkasse", einheit: "%", step: 0.1,
-        hinweis: "Durchschnitt 2026: 2,9 %" },
+        hinweis: (p) => `Durchschnitt ${p.jahr}: ${satz(p.kvZusatz)}` },
       { id: "werbungskosten", label: "Werbungskosten", einheit: "€/Jahr", step: 100,
-        hinweis: "Unter 1.230 € gilt der Pauschbetrag." },
+        hinweis: (p) => `Unter ${tausend(p.werbungskostenPausch)} € gilt der Pauschbetrag.` },
       { id: "kapital", label: "Kapitalerträge", einheit: "€/Jahr", step: 100,
         hinweis: "Zinsen, Dividenden, Kursgewinne" },
       { id: "arbeitgeber", label: "Arbeitgeberanteil zur Sozialversicherung einbeziehen", typ: "check",
@@ -46,7 +48,7 @@ const ABSCHNITTE = [
       { id: "getraenke", label: "Getränke ohne Alkohol", einheit: "€/Monat", step: 5,
         hinweis: "Wasser, Saft, Limonade: 19 %" },
       { id: "gastro", label: "Restaurant, Café, Imbiss", einheit: "€/Monat", step: 10,
-        hinweis: "Speisen 7 %, Getränke 19 %" },
+        hinweis: (p) => `Speisen ${satz(p.ustGastroSpeisen)}, Getränke ${satz(p.ust)}` },
       { id: "konsum19", label: "Kleidung, Technik, Haushalt, Freizeit", einheit: "€/Monat", step: 10,
         hinweis: "19 % Umsatzsteuer" },
       { id: "konsum7", label: "Bücher, Zeitungen, Nahverkehr, Kultur", einheit: "€/Monat", step: 10,
@@ -66,7 +68,7 @@ const ABSCHNITTE = [
       { id: "heizoelL", label: "Heizöl", einheit: "l/Jahr", step: 100,
         preis: { id: "heizoelPreis", einheit: "€/l", step: 0.05 } },
       { id: "co2Preis", label: "CO₂-Preis", einheit: "€/t", step: 1,
-        hinweis: "Preiskorridor 2026: 55 bis 65 €/t" },
+        hinweis: (p) => p.co2Hinweis },
     ],
   },
   {
@@ -79,11 +81,11 @@ const ABSCHNITTE = [
         preis: { id: "dieselPreis", einheit: "€/l", step: 0.01 } },
       { id: "kfzSteuer", label: "Kfz-Steuer", einheit: "€/Jahr", step: 10 },
       { id: "fluegeKurz", label: "Flüge in Europa", einheit: "pro Jahr", step: 1,
-        hinweis: `Abflüge aus Deutschland, ${komma(P.luftverkehr.kurz)} € je Flug` },
+        hinweis: (p) => `Abflüge aus Deutschland, ${komma(p.luftverkehr.kurz)} € je Flug` },
       { id: "fluegeMittel", label: "Flüge bis 6.000 km", einheit: "pro Jahr", step: 1,
-        hinweis: `${komma(P.luftverkehr.mittel)} € je Abflug` },
+        hinweis: (p) => `${komma(p.luftverkehr.mittel)} € je Abflug` },
       { id: "fluegeLang", label: "Langstreckenflüge", einheit: "pro Jahr", step: 1,
-        hinweis: `${komma(P.luftverkehr.lang)} € je Abflug` },
+        hinweis: (p) => `${komma(p.luftverkehr.lang)} € je Abflug` },
     ],
   },
   {
@@ -114,7 +116,7 @@ const ABSCHNITTE = [
         hinweis: "Haftpflicht, Hausrat, Kfz, Rechtsschutz. Ohne Kranken-, Lebens- und Rentenversicherung." },
       { id: "lotto", label: "Lotto und Lotterien", einheit: "€/Monat", step: 5 },
       { id: "hundesteuer", label: "Hundesteuer", einheit: "€/Jahr", step: 10 },
-      { id: "rundfunk", label: `Rundfunkbeitrag (${komma(P.rundfunkMonat)} €/Monat)`, typ: "check" },
+      { id: "rundfunk", label: (p) => `Rundfunkbeitrag (${komma(p.rundfunkMonat)} €/Monat)`, typ: "check" },
     ],
   },
 ];
@@ -125,9 +127,10 @@ let ansicht = "art";
 // --- Zustand im URL-Hash ---
 
 function ladeZustand() {
-  const zustand = { ...STANDARD };
   const params = new URLSearchParams(location.hash.slice(1));
+  const zustand = standard(Number(params.get("jahr")) || STANDARD.jahr);
   for (const [key, wert] of params) {
+    if (key === "jahr") continue;
     if (!(key in STANDARD)) continue;
     if (typeof STANDARD[key] === "boolean") zustand[key] = wert === "1";
     else if (Number.isFinite(Number(wert))) zustand[key] = Number(wert);
@@ -137,8 +140,9 @@ function ladeZustand() {
 
 function speichereZustand(zustand) {
   const params = new URLSearchParams();
+  const vorgabe = { ...standard(zustand.jahr), jahr: STANDARD.jahr };
   for (const [key, wert] of Object.entries(zustand)) {
-    if (wert === STANDARD[key]) continue;
+    if (wert === vorgabe[key]) continue;
     params.set(key, typeof wert === "boolean" ? (wert ? "1" : "0") : String(wert));
   }
   const hash = params.toString();
@@ -175,13 +179,17 @@ function zahlFeld(id, einheit, step, wert, max) {
     el("span", { class: "einheit", text: einheit }));
 }
 
-function baueFeld(f, zustand) {
+// Texte können vom Jahr abhängen: dann sind sie Funktionen der Parameter p.
+const text = (t, p) => (typeof t === "function" ? t(p) : t);
+
+function baueFeld(f, zustand, p) {
+  const hinweis = f.hinweis && el("small", { "data-hinweis": f.id, text: text(f.hinweis, p) });
   if (f.typ === "check") {
     return el("div", { class: "feld check", "data-feld": f.id },
       el("label", {},
         el("input", { type: "checkbox", name: f.id, checked: zustand[f.id] }),
-        el("span", { text: f.label })),
-      f.hinweis && el("small", { text: f.hinweis }));
+        el("span", { "data-label": f.id, text: text(f.label, p) })),
+      hinweis);
   }
   if (f.typ === "auswahl") {
     const select = el("select", { name: f.id, id: f.id });
@@ -196,12 +204,23 @@ function baueFeld(f, zustand) {
     zeile.append(el("span", { class: "zu", text: "zu" }), zahlFeld(p.id, p.einheit, p.step, zustand[p.id]));
   }
   return el("div", { class: f.preis ? "feld paar" : "feld", "data-feld": f.id },
-    el("label", { for: f.id, text: f.label }), zeile, f.hinweis && el("small", { text: f.hinweis }));
+    el("label", { for: f.id, "data-label": f.id, text: text(f.label, p) }), zeile, hinweis);
+}
+
+function baueJahrwahl(zustand) {
+  const optionen = JAHRE.map((jahr) => el("label", {},
+    el("input", { type: "radio", name: "jahr", value: jahr, checked: zustand.jahr === jahr }),
+    el("span", { text: parameter(jahr).entwurf ? `${jahr} (Entwurf)` : String(jahr) })));
+  return el("div", { class: "jahrwahl", role: "radiogroup", "aria-labelledby": "jahrwahl-titel" },
+    el("span", { id: "jahrwahl-titel", text: "Steuerjahr" }),
+    el("div", { class: "jahre" }, ...optionen));
 }
 
 function baueFormular(zustand) {
+  const p = parameter(zustand.jahr);
+  form.append(baueJahrwahl(zustand));
   ABSCHNITTE.forEach((a, i) => {
-    const felder = el("div", { class: "felder" }, ...a.felder.map((f) => baueFeld(f, zustand)));
+    const felder = el("div", { class: "felder" }, ...a.felder.map((f) => baueFeld(f, zustand, p)));
     form.append(el("details", { class: "abschnitt", open: a.offen, "data-abschnitt": i },
       el("summary", {}, el("span", { text: a.titel }), el("span", { class: "summe" })),
       felder));
@@ -283,7 +302,7 @@ function zeigeErgebnis(r) {
 
   const tage = document.getElementById("tage");
   if (r.quote > 0 && r.quote < 1) {
-    const tag = new Date(P.jahr, 0, 1 + Math.round(r.quote * 365));
+    const tag = new Date(r.jahr, 0, 1 + Math.round(r.quote * 365));
     tage.textContent = `Rechnerisch arbeiten Sie bis zum ${datum.format(tag)} nur für Steuern und Abgaben.`;
   } else {
     tage.textContent = r.quote >= 1 ? "Die Steuern und Abgaben sind höher als das Einkommen." : "";
@@ -303,8 +322,44 @@ function zeigeErgebnis(r) {
     `Steuern und Abgaben: ${euro.format(r.nachKindergeld)} € · ${prozent.format(r.quote)}`;
 }
 
+// Texte im Formular und in den Hinweisen für das gewählte Jahr
+function zeigeJahr(p) {
+  for (const a of ABSCHNITTE) {
+    for (const f of a.felder) {
+      if (typeof f.label === "function") form.querySelector(`[data-label="${f.id}"]`).textContent = f.label(p);
+      if (typeof f.hinweis === "function") form.querySelector(`[data-hinweis="${f.id}"]`).textContent = f.hinweis(p);
+    }
+  }
+  document.getElementById("entwurf").hidden = !p.entwurf;
+  document.getElementById("rechtsstand").textContent = p.entwurf
+    ? `Rechtsstand ${p.jahr} nach den Gesetzentwürfen, Stand 27. Oktober 2026. Die Werte können sich noch ändern.`
+    : `Rechtsstand ${p.jahr}.`;
+  document.getElementById("abzug-pausch").textContent = tausend(p.werbungskostenPausch);
+  document.getElementById("abzug-kfb").textContent = tausend(p.kinderFreibetrag);
+  document.getElementById("gastro-satz").textContent = satz(p.ustGastroSpeisen);
+}
+
+// Bei einem Jahreswechsel folgen Felder mit der Vorgabe des alten Jahres der Vorgabe des neuen Jahres.
+const JAHRESVORGABEN = ["kvZusatz", "co2Preis"];
+let jahr;
+
+function wechsleJahr(zustand) {
+  if (jahr !== undefined && zustand.jahr !== jahr) {
+    const alt = standard(jahr);
+    const neu = standard(zustand.jahr);
+    for (const key of JAHRESVORGABEN) {
+      if (zustand[key] !== alt[key]) continue;
+      zustand[key] = neu[key];
+      form.elements[key].value = neu[key];
+    }
+  }
+  if (zustand.jahr !== jahr) zeigeJahr(parameter(zustand.jahr));
+  jahr = zustand.jahr;
+}
+
 function aktualisiere() {
   const zustand = liesFormular();
+  wechsleJahr(zustand);
   for (const a of ABSCHNITTE) {
     for (const f of a.felder) {
       if (!f.wenn) continue;
