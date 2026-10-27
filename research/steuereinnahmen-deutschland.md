@@ -9,6 +9,12 @@ share. Amounts are in billion euro (Mrd. Euro), rounded to one decimal.
 
 ## Ranking 2025
 
+![Treemap of tax revenue in Germany 2025](steuereinnahmen-2025-treemap.svg)
+
+The area of each tile is proportional to the revenue, and the color shows the level of government. Hover a
+tile to see its exact value. To regenerate the chart after a data change, edit the data in `treemap.py` and
+run `python3 research/treemap.py > research/steuereinnahmen-2025-treemap.svg`.
+
 | #  | Tax                                                           |  2025 |  2024 | Level        |
 | -- | ------------------------------------------------------------- | ----: | ----: | ------------ |
 | 1  | Steuern vom Umsatz (VAT, incl. Einfuhrumsatzsteuer)           | 310.2 | 302.1 | Gemeinschaft |

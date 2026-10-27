@@ -1,0 +1,182 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 600" width="960" height="600" role="img" aria-labelledby="title desc">
+<title id="title">Steuereinnahmen Deutschland 2025</title>
+<desc id="desc">Treemap of tax revenue in Germany 2025 by tax type, total about 987.8 billion euro. Area is proportional to revenue. Color shows the level of government that receives the tax.</desc>
+<style>
+.bg{fill:#fcfcfb}
+.ink1{fill:#0b0b0b}
+.ink2{fill:#52514e}
+.tile{stroke:#fcfcfb;stroke-width:2}
+text{font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif}
+.tile:hover{opacity:.85}
+.f-gemeinschaft{fill:#2a78d6}
+.t-gemeinschaft{fill:#0b0b0b}
+.f-gemeinde{fill:#eb6834}
+.t-gemeinde{fill:#0b0b0b}
+.f-bund{fill:#1baf7a}
+.t-bund{fill:#0b0b0b}
+.f-laender{fill:#eda100}
+.t-laender{fill:#0b0b0b}
+.f-eu{fill:#e87ba4}
+.t-eu{fill:#0b0b0b}
+@media (prefers-color-scheme: dark){
+.bg{fill:#1a1a19}
+.ink1{fill:#f0efec}
+.ink2{fill:#c3c2b7}
+.tile{stroke:#1a1a19}
+.f-gemeinschaft{fill:#3987e5}
+.t-gemeinschaft{fill:#0b0b0b}
+.f-gemeinde{fill:#d95926}
+.t-gemeinde{fill:#0b0b0b}
+.f-bund{fill:#199e70}
+.t-bund{fill:#0b0b0b}
+.f-laender{fill:#c98500}
+.t-laender{fill:#0b0b0b}
+.f-eu{fill:#d55181}
+.t-eu{fill:#0b0b0b}
+}
+</style>
+<rect class="bg" width="960" height="600"/>
+<text class="ink1" x="0" y="24" font-size="20" font-weight="600">Steuereinnahmen Deutschland 2025: 987.8 Mrd. Euro</text>
+<text class="ink2" x="0" y="46" font-size="13">Area = revenue. Sources: BMF Monatsbericht Januar 2026, Destatis. See steuereinnahmen-deutschland.md.</text>
+<rect class="f-gemeinschaft" x="0" y="64" width="12" height="12" rx="2"/>
+<text class="ink2" x="18" y="75" font-size="13">Gemeinschaftsteuern 746.3</text>
+<rect class="f-gemeinde" x="218.0" y="64" width="12" height="12" rx="2"/>
+<text class="ink2" x="236.0" y="75" font-size="13">Gemeindesteuern 92.5</text>
+<rect class="f-bund" x="400.0" y="64" width="12" height="12" rx="2"/>
+<text class="ink2" x="418.0" y="75" font-size="13">Bundessteuern 108.8</text>
+<rect class="f-laender" x="574.8" y="64" width="12" height="12" rx="2"/>
+<text class="ink2" x="592.8" y="75" font-size="13">Ländersteuern 34.3</text>
+<rect class="f-eu" x="742.4" y="64" width="12" height="12" rx="2"/>
+<text class="ink2" x="760.4" y="75" font-size="13">EU (Zölle) 5.9</text>
+<g>
+<title>Steuern vom Umsatz (incl. Einfuhrumsatzsteuer): 310.2 Mrd. Euro (31.4 %)</title>
+<rect class="tile f-gemeinschaft" x="0.0" y="96.0" width="301.5" height="504.0" rx="4"/>
+<text class="t-gemeinschaft" x="8.0" y="118.0" font-size="16" font-weight="600">Umsatzsteuer</text>
+<text class="t-gemeinschaft" x="8.0" y="138.0" font-size="16">310.2 · 31.4 %</text>
+</g>
+<g>
+<title>Lohnsteuer (net of Kindergeld): 262.7 Mrd. Euro (26.6 %)</title>
+<rect class="tile f-gemeinschaft" x="301.5" y="96.0" width="423.9" height="303.6" rx="4"/>
+<text class="t-gemeinschaft" x="309.5" y="118.0" font-size="16" font-weight="600">Lohnsteuer</text>
+<text class="t-gemeinschaft" x="309.5" y="138.0" font-size="16">262.7 · 26.6 %</text>
+</g>
+<g>
+<title>Veranlagte Einkommensteuer: 78.4 Mrd. Euro (7.9 %)</title>
+<rect class="tile f-gemeinschaft" x="301.5" y="399.6" width="191.5" height="200.4" rx="4"/>
+<text class="t-gemeinschaft" x="309.5" y="421.6" font-size="16" font-weight="600">Einkommensteuer</text>
+<text class="t-gemeinschaft" x="309.5" y="441.6" font-size="16">78.4 · 7.9 %</text>
+</g>
+<g>
+<title>Körperschaftsteuer: 39.2 Mrd. Euro (4.0 %)</title>
+<rect class="tile f-gemeinschaft" x="493.0" y="399.6" width="171.8" height="111.7" rx="4"/>
+<text class="t-gemeinschaft" x="501.0" y="421.6" font-size="16" font-weight="600">Körperschaft-</text>
+<text class="t-gemeinschaft" x="501.0" y="441.6" font-size="16" font-weight="600">steuer</text>
+<text class="t-gemeinschaft" x="501.0" y="461.6" font-size="16">39.2 · 4.0 %</text>
+</g>
+<g>
+<title>Nicht veranlagte Steuern vom Ertrag: 31.1 Mrd. Euro (3.2 %)</title>
+<rect class="tile f-gemeinschaft" x="493.0" y="511.3" width="171.8" height="88.7" rx="4"/>
+<text class="t-gemeinschaft" x="501.0" y="533.3" font-size="16" font-weight="600">Kapitalertrag-</text>
+<text class="t-gemeinschaft" x="501.0" y="553.3" font-size="16" font-weight="600">steuer</text>
+<text class="t-gemeinschaft" x="501.0" y="573.3" font-size="16">31.1 · 3.2 %</text>
+</g>
+<g>
+<title>Abgeltungsteuer auf Zins- und Veräußerungserträge: 24.8 Mrd. Euro (2.5 %)</title>
+<rect class="tile f-gemeinschaft" x="664.7" y="399.6" width="60.6" height="200.4" rx="4"/>
+<text class="t-gemeinschaft" x="684.7" y="592.0" font-size="16" font-weight="600" transform="rotate(-90 684.7 592.0)">Abgeltungsteuer</text>
+<text class="t-gemeinschaft" x="684.7" y="612.0" font-size="16" transform="rotate(-90 684.7 592.0)">24.8 · 2.5 %</text>
+</g>
+<g>
+<title>Energiesteuer: 37.6 Mrd. Euro (3.8 %)</title>
+<rect class="tile f-bund" x="725.3" y="96.0" width="123.3" height="149.2" rx="4"/>
+<text class="t-bund" x="733.3" y="118.0" font-size="16" font-weight="600">Energie-</text>
+<text class="t-bund" x="733.3" y="138.0" font-size="16" font-weight="600">steuer</text>
+<text class="t-bund" x="733.3" y="158.0" font-size="16">37.6</text>
+</g>
+<g>
+<title>Versicherungsteuer: 19.6 Mrd. Euro (2.0 %)</title>
+<rect class="tile f-bund" x="725.3" y="245.2" width="123.3" height="77.9" rx="4"/>
+<text class="t-bund" x="733.3" y="264.2" font-size="13" font-weight="600">Versicherung-</text>
+<text class="t-bund" x="733.3" y="281.2" font-size="13" font-weight="600">steuer</text>
+<text class="t-bund" x="733.3" y="298.2" font-size="13">19.6</text>
+</g>
+<g>
+<title>Tabaksteuer: 17.6 Mrd. Euro (1.8 %)</title>
+<rect class="tile f-bund" x="848.6" y="96.0" width="111.4" height="77.6" rx="4"/>
+<text class="t-bund" x="856.6" y="118.0" font-size="16" font-weight="600">Tabak-</text>
+<text class="t-bund" x="856.6" y="138.0" font-size="16" font-weight="600">steuer</text>
+<text class="t-bund" x="856.6" y="158.0" font-size="16">17.6</text>
+</g>
+<g>
+<title>Solidaritätszuschlag: 12.9 Mrd. Euro (1.3 %)</title>
+<rect class="tile f-bund" x="848.6" y="173.6" width="111.4" height="56.6" rx="4"/>
+<text class="t-bund" x="856.6" y="195.6" font-size="16" font-weight="600">Soli</text>
+<text class="t-bund" x="856.6" y="215.6" font-size="16">12.9</text>
+</g>
+<g>
+<title>Kraftfahrzeugsteuer: 9.6 Mrd. Euro (1.0 %)</title>
+<rect class="tile f-bund" x="848.6" y="230.2" width="50.6" height="92.9" rx="4"/>
+<text class="t-bund" x="865.6" y="315.1" font-size="13" font-weight="600" transform="rotate(-90 865.6 315.1)">Kfz-Steuer</text>
+<text class="t-bund" x="865.6" y="332.1" font-size="13" transform="rotate(-90 865.6 315.1)">9.6</text>
+</g>
+<g>
+<title>Stromsteuer: 5.9 Mrd. Euro (0.6 %)</title>
+<rect class="tile f-bund" x="899.2" y="230.2" width="60.8" height="47.2" rx="4"/>
+<text class="t-bund" x="907.2" y="249.2" font-size="13" font-weight="600">Strom-</text>
+<text class="t-bund" x="907.2" y="266.2" font-size="13" font-weight="600">steuer</text>
+</g>
+<g>
+<title>Luftverkehrsteuer: 2.1 Mrd. Euro (0.2 %)</title>
+<rect class="tile f-bund" x="899.2" y="277.4" width="44.1" height="22.9" rx="4"/>
+</g>
+<g>
+<title>Alkoholsteuer: 2.0 Mrd. Euro (0.2 %)</title>
+<rect class="tile f-bund" x="899.2" y="300.3" width="44.1" height="22.8" rx="4"/>
+</g>
+<g>
+<title>Übrige Bundessteuern: 1.6 Mrd. Euro (0.2 %)</title>
+<rect class="tile f-bund" x="943.3" y="277.4" width="16.7" height="45.7" rx="4"/>
+</g>
+<g>
+<title>Gewerbesteuer (gross): 76.4 Mrd. Euro (7.7 %)</title>
+<rect class="tile f-gemeinde" x="725.3" y="323.1" width="193.8" height="193.1" rx="4"/>
+<text class="t-gemeinde" x="733.3" y="345.1" font-size="16" font-weight="600">Gewerbesteuer</text>
+<text class="t-gemeinde" x="733.3" y="365.1" font-size="16">76.4 · 7.7 %</text>
+</g>
+<g>
+<title>Grundsteuer A + B: 16.1 Mrd. Euro (1.6 %)</title>
+<rect class="tile f-gemeinde" x="919.2" y="323.1" width="40.8" height="193.1" rx="4"/>
+<text class="t-gemeinde" x="939.2" y="508.2" font-size="16" font-weight="600" transform="rotate(-90 939.2 508.2)">Grundsteuer</text>
+</g>
+<g>
+<title>Erbschaftsteuer: 15.4 Mrd. Euro (1.6 %)</title>
+<rect class="tile f-laender" x="725.3" y="516.2" width="90.1" height="83.8" rx="4"/>
+<text class="t-laender" x="733.3" y="535.2" font-size="13" font-weight="600">Erbschaft-</text>
+<text class="t-laender" x="733.3" y="552.2" font-size="13" font-weight="600">steuer</text>
+<text class="t-laender" x="733.3" y="569.2" font-size="13">15.4</text>
+</g>
+<g>
+<title>Grunderwerbsteuer: 15.1 Mrd. Euro (1.5 %)</title>
+<rect class="tile f-laender" x="815.4" y="516.2" width="88.2" height="83.8" rx="4"/>
+<text class="t-laender" x="823.4" y="532.2" font-size="10" font-weight="600">Grunderwerb-</text>
+<text class="t-laender" x="823.4" y="546.2" font-size="10" font-weight="600">steuer</text>
+<text class="t-laender" x="823.4" y="560.2" font-size="10">15.1</text>
+</g>
+<g>
+<title>Rennwett- und Lotteriesteuer: 2.5 Mrd. Euro (0.2 %)</title>
+<rect class="tile f-laender" x="903.7" y="516.2" width="22.1" height="54.7" rx="4"/>
+</g>
+<g>
+<title>Übrige Ländersteuern: 0.8 Mrd. Euro (0.1 %)</title>
+<rect class="tile f-laender" x="903.7" y="570.9" width="22.1" height="17.2" rx="4"/>
+</g>
+<g>
+<title>Biersteuer: 0.5 Mrd. Euro (0.1 %)</title>
+<rect class="tile f-laender" x="903.7" y="588.0" width="22.1" height="12.0" rx="4"/>
+</g>
+<g>
+<title>Zölle: 5.9 Mrd. Euro (0.6 %)</title>
+<rect class="tile f-eu" x="925.8" y="516.2" width="34.2" height="83.8" rx="4"/>
+<text class="t-eu" x="945.8" y="592.0" font-size="16" font-weight="600" transform="rotate(-90 945.8 592.0)">Zölle</text>
+</g>
+</svg>
