@@ -1,0 +1,13 @@
+{
+  "name": "steusira",
+  "version": "1.0.0",
+  "description": "Static site for steusira.mbarkhau.workers.dev",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy"
+  },
+  "devDependencies": {
+    "wrangler": "^4.154.0"
+  },
+  "private": true
+}
