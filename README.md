@@ -11,7 +11,12 @@ gesamte Belastung, die sich aus der individuellen Situation ergibt.
 ## Status
 
 Das Projekt ist in einer frühen Phase. Die Website unter
-[steusira.mbarkhau.workers.dev](https://steusira.mbarkhau.workers.dev) ist aktuell nur ein Platzhalter.
+[steusira.mbarkhau.workers.dev](https://steusira.mbarkhau.workers.dev) enthält einen ersten Steuerrechner
+(Rechtsstand 2026). Er addiert die Steuern auf das Einkommen, die Sozialabgaben und die Steuern auf Konsum,
+zum Beispiel Umsatzsteuer, Energiesteuer, Tabaksteuer und Alkoholsteuer. Die Parameter und Quellen stehen in
+[research/steuerrechner-parameter-2026.md](research/steuerrechner-parameter-2026.md).
+
+Die aktuelle Version steht in der Datei `VERSION`, die Änderungen stehen in `CHANGELOG.md`.
 
 
 ## Entwicklung
@@ -24,4 +29,7 @@ Die Website ist eine statische Seite im Verzeichnis `public/`. Die Auslieferung 
 npm install       # Abhängigkeiten installieren
 npm run dev       # lokalen Entwicklungsserver starten
 npm run deploy    # auf Cloudflare Workers veröffentlichen
+npm test          # Rechenlogik testen
 ```
+
+Die Rechenlogik steht in `public/steuern.js`. Das Modul hat keine Abhängigkeit vom Browser.

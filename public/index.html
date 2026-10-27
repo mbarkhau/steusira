@@ -1,20 +1,67 @@
 <!doctype html>
-<html lang="en">
+<html lang="de">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Steusira</title>
-  <meta name="description" content="Steusira">
+  <title>Steusira – Steuerrechner</title>
+  <meta name="description" content="Wie viel Steuern zahle ich tatsächlich? Steusira berechnet die gesamte Steuer- und Abgabenlast: Einkommensteuer, Sozialabgaben und die Steuern auf Konsum, Energie, Tabak und Alkohol.">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/style.css">
+  <script type="module" src="/rechner.js"></script>
 </head>
 <body>
-  <main>
-    <h1>Steusira</h1>
-    <p class="lede">Coming soon.</p>
+  <main class="rechner">
+    <header class="kopf">
+      <h1>Steusira</h1>
+      <p class="lede">Wie viel Steuern zahle ich tatsächlich? Der Rechner addiert alle Steuern und Abgaben: auf
+        das Einkommen und auf das, was Sie ausgeben.</p>
+    </header>
+
+    <div class="layout">
+      <form id="eingabe" class="eingabe" autocomplete="off" novalidate></form>
+
+      <section id="ergebnis" class="ergebnis" aria-live="polite">
+        <div class="kpi">
+          <p class="kpi-label">Steuern und Abgaben pro Jahr</p>
+          <p class="kpi-wert" id="gesamt">–</p>
+          <p class="kpi-sub" id="quote"></p>
+        </div>
+        <p class="tage" id="tage"></p>
+
+        <div class="tabs" role="tablist">
+          <button type="button" role="tab" aria-selected="true" data-ansicht="art">Nach Steuerart</button>
+          <button type="button" role="tab" aria-selected="false" data-ansicht="bereich">Nach Bereich</button>
+        </div>
+        <ul class="balken" id="balken"></ul>
+        <ul class="legende" id="legende"></ul>
+
+        <h2>Ihr Geld im Jahr</h2>
+        <table class="bilanz" id="bilanz"></table>
+
+        <details class="hinweise">
+          <summary>Annahmen und Grenzen</summary>
+          <ul>
+            <li>Rechtsstand 2026. Einkommensteuer nach Jahresveranlagung, nicht nach Lohnsteuerabzug.</li>
+            <li>Nur Arbeitnehmer mit gesetzlicher Krankenversicherung. Minijobs, Midijobs, Beamte,
+              Selbständige und Privatversicherte rechnet der Rechner nicht korrekt.</li>
+            <li>Abzüge: Werbungskosten (mindestens 1.230 €), Vorsorgeaufwendungen und Sonderausgaben-Pauschbetrag.
+              Kinderfreibetrag voll (9.756 € je Kind) mit Günstigerprüfung gegen das Kindergeld.</li>
+            <li>Bei Verheirateten gilt Zusammenveranlagung. Alle Ausgaben sind dann Ausgaben des Haushalts.</li>
+            <li>Gastronomie: 70 % Speisen (7 %) und 30 % Getränke (19 %). Bier mit 11,5 °Plato. Spirituosen mit
+              40 % vol. Zigarettenschachtel mit 20 Stück, Tabakbeutel mit 40 g.</li>
+            <li>Nicht enthalten sind Steuern, die Unternehmen tragen und über die Preise weitergeben, zum Beispiel
+              Gewerbe- und Körperschaftsteuer, sowie die Umlagen der Arbeitgeber (U1, U2, Unfallversicherung).</li>
+            <li>CO₂-Preis und Rundfunkbeitrag sind rechtlich keine Steuern. Sie sind als „sonstige Abgaben“
+              getrennt aufgeführt.</li>
+            <li>Ergebnis ohne Gewähr. Der Rechner ersetzt keine Steuerberatung.</li>
+          </ul>
+        </details>
+      </section>
+    </div>
   </main>
+  <div class="leiste" id="leiste" aria-hidden="true"></div>
   <footer>
-    <p>&copy; <span id="year">2026</span> mbarkhau</p>
+    <p>&copy; <span id="year">2026</span> mbarkhau · Version 2026.10001</p>
   </footer>
   <script>document.getElementById("year").textContent = new Date().getFullYear();</script>
 </body>
