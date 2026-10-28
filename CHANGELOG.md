@@ -1,5 +1,21 @@
 # Changelog
 
+## 2026.10007
+
+Questionnaire: navigation with Zurück and Weiter, clickable progress segments, no scrollbar reflow (no plan).
+
+- `public/fragebogen.html`, `public/fragebogen.js`, `public/style.css`: new buttons Zurück and Weiter at the
+  bottom right of the form. The buttons replace the Zurück link in the header and the Weiter buttons in the
+  steps. On the last question step, the label is "Auswerten". On the result, Weiter is hidden.
+- Weiter without an answer selects the default answer. Without a default (Bundesland, Besoldungsgruppe) and
+  without an income, Weiter is disabled.
+- Completed segments of the progress bar are buttons. A click goes back to that step.
+- `html { scrollbar-gutter: stable; }`: the page reserves the space for the scrollbar, so the content does not
+  move when the scrollbar appears.
+- Validation: `node --test` passes. Manual check in headless Chromium: navigation through all steps, default
+  answers, Enter key, segment click, Zurück, constant width of the content with and without a scrollbar.
+
+
 ## 2026.10006
 
 Questionnaire: Berufsgruppe, Besoldungsgruppe, Geburtsjahr and Berufseintritt (no plan).

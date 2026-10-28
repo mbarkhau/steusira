@@ -45,6 +45,7 @@ const aktiv = (s) => s.dataset.schritt !== "besoldung" || antwort.beruf === "bea
 const fragen = () => schritte.filter((s) => aktiv(s) && s.dataset.schritt !== "ergebnis");
 const segmente = document.getElementById("segmente");
 const zurueck = document.getElementById("zurueck");
+const weiterButton = document.getElementById("weiter");
 
 const antwort = {
   verheiratet: null, kinder: null, kirche: null, kv: null, land: null, beruf: null, besoldung: null, raucher: null,
@@ -112,9 +113,19 @@ function zeige(index) {
 
   const liste = fragen();
   const position = fertig ? liste.length : liste.indexOf(schritt);
-  segmente.replaceChildren(...liste.map((_, i) => {
+  // Erledigte Segmente sind Buttons: ein Klick geht zurück zu diesem Schritt.
+  segmente.replaceChildren(...liste.map((s, i) => {
     const li = document.createElement("li");
     li.className = i < position ? "erledigt" : i === position ? "aktiv" : "";
+    const seg = document.createElement(i < position ? "button" : "span");
+    seg.className = "seg";
+    if (i < position) {
+      seg.type = "button";
+      seg.dataset.gehe = String(schritte.indexOf(s));
+      seg.title = `Schritt ${i + 1}: ${s.querySelector("h2").textContent}`;
+      seg.setAttribute("aria-label", `Zurück zu ${seg.title}`);
+    }
+    li.append(seg);
     return li;
   }));
   const fortschritt = document.getElementById("fortschritt");
@@ -122,6 +133,9 @@ function zeige(index) {
   fortschritt.setAttribute("aria-valuenow", String(Math.min(position + 1, liste.length)));
   document.getElementById("schritt-text").textContent = fertig ? "Fertig" : `Schritt ${position + 1} von ${liste.length}`;
   zurueck.style.visibility = index === 0 ? "hidden" : "visible";
+  weiterButton.hidden = fertig;
+  weiterButton.textContent = schritt.dataset.schritt === "wohnraum" ? "Auswerten" : "Weiter";
+  aktualisiereWeiter();
 
   if (schritt.dataset.schritt === "einkommen") aktualisiereEinkommen();
   if (fertig) zeigeErgebnis();
@@ -153,7 +167,19 @@ function nachbar(richtung) {
 }
 const weiter = () => zeige(nachbar(1));
 
+// Ohne Vorgabe (Bundesland, Besoldungsgruppe) und ohne Einkommen ist "Weiter" erst nach einer Antwort aktiv.
+function aktualisiereWeiter() {
+  const schritt = schritte[aktuell];
+  const name = schritt.dataset.schritt;
+  const ohneVorgabe = schritt.querySelector(".wahl") && !schritt.querySelector(".wahl [data-vorgabe]");
+  weiterButton.disabled = name === "einkommen" ? !antwort.einkommen : Boolean(ohneVorgabe && !antwort[name]);
+}
+
 zurueck.addEventListener("click", () => zeige(nachbar(-1)));
+segmente.addEventListener("click", (event) => {
+  const ziel = event.target.closest("[data-gehe]");
+  if (ziel) zeige(Number(ziel.dataset.gehe));
+});
 
 form.addEventListener("click", (event) => {
   const button = event.target.closest(".wahl button");
@@ -169,11 +195,14 @@ form.addEventListener("click", (event) => {
 
 form.addEventListener("submit", (event) => {
   event.preventDefault();
-  const name = schritte[aktuell].dataset.schritt;
+  const schritt = schritte[aktuell];
+  const name = schritt.dataset.schritt;
+  if (name === "ergebnis") return;
+  // Ohne Antwort gilt die Vorgabe. Der Klick auf die Vorgabe geht weiter oder öffnet die Folgefrage.
+  if (schritt.querySelector(".wahl") && !antwort[name]) return schritt.querySelector(".wahl [data-vorgabe]")?.click();
   if (name === "einkommen" && !antwort.einkommen) return;
   if (name === "kinder" && antwort.kinder === "ja" && !kinderAnzahl()) return form.elements.kinderAnzahl.focus();
   if (name === "lebenslauf" && !pruefeLebenslauf()) return;
-  if (schritte[aktuell].querySelector(".folge[hidden]")) return;
   weiter();
 });
 
@@ -218,7 +247,7 @@ function aktualisiereEinkommen() {
     if (feld !== fest?.feld) form.elements[feld].value = werte ? euro.format(werte[feld]) : "";
     form.querySelector(`[data-fuer="${feld}"]`).classList.toggle("an", geschaetzt);
   }
-  document.getElementById("einkommen-weiter").disabled = !fest;
+  aktualisiereWeiter();
   document.getElementById("kv-hinweis").hidden = antwort.kv !== "privat";
 }
 

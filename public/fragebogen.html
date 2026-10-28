@@ -15,10 +15,7 @@
       <a class="fb-marke" href="/">Steusira</a>
       <div class="fortschritt" id="fortschritt" role="progressbar" aria-valuemin="0" aria-valuemax="10"
         aria-valuenow="1">
-        <div class="fb-zeile">
-          <button type="button" class="zurueck" id="zurueck">← Zurück</button>
-          <span id="schritt-text">Schritt 1 von 10</span>
-        </div>
+        <div class="fb-zeile"><span id="schritt-text">Schritt 1 von 10</span></div>
         <ol class="segmente" id="segmente"></ol>
       </div>
     </header>
@@ -42,7 +39,6 @@
           <label for="kinderAnzahl">Anzahl Kinder mit Kindergeldbezug</label>
           <div class="zahl"><input id="kinderAnzahl" name="kinderAnzahl" inputmode="numeric" value="1">
             <span class="einheit">Kinder</span></div>
-          <button type="submit" class="weiter">Weiter</button>
         </div>
       </section>
 
@@ -105,7 +101,6 @@
           </div>
         </div>
         <p class="fb-hinweis" id="lebenslauf-fehler" hidden></p>
-        <button type="submit" class="weiter">Weiter</button>
       </section>
 
       <section class="schritt" data-schritt="einkommen" hidden>
@@ -118,7 +113,6 @@
         <p class="fb-hinweis" id="kv-hinweis" hidden>Die Schätzung rechnet auch bei privater Krankenversicherung
           mit den Beiträgen der gesetzlichen Krankenversicherung.</p>
         <p class="fb-hinweis">Die Schätzung nimmt einen Verdiener an, ohne Sonderzahlungen.</p>
-        <button type="submit" class="weiter" id="einkommen-weiter" disabled>Weiter</button>
       </section>
 
       <section class="schritt" data-schritt="raucher" hidden>
@@ -131,7 +125,6 @@
           <label for="schachteln">Anzahl Schachteln pro Woche</label>
           <div class="zahl"><input id="schachteln" name="schachteln" inputmode="decimal" value="3">
             <span class="einheit">pro Woche</span></div>
-          <button type="submit" class="weiter">Weiter</button>
         </div>
       </section>
 
@@ -148,7 +141,6 @@
               <span class="einheit">€/Monat</span></div>
           </div>
         </div>
-        <button type="submit" class="weiter">Auswerten</button>
       </section>
 
       <section class="schritt" data-schritt="ergebnis" hidden>
@@ -160,11 +152,16 @@
         <dl class="antworten" id="antworten"></dl>
         <p><a id="zum-rechner" href="/">Im ausführlichen Rechner weiter anpassen →</a></p>
       </section>
+
+      <nav class="fb-nav" aria-label="Navigation im Fragebogen">
+        <button type="button" class="zurueck" id="zurueck">Zurück</button>
+        <button type="submit" class="weiter" id="weiter">Weiter</button>
+      </nav>
     </form>
   </main>
   <footer>
     <p>*Zahlen unter Vorbehalt</p>
-    <p>&copy; <span id="year">2026</span> Steusira · Version 2026.10006</p>
+    <p>&copy; <span id="year">2026</span> Steusira · Version 2026.10007</p>
   </footer>
   <script>document.getElementById("year").textContent = new Date().getFullYear();</script>
 </body>

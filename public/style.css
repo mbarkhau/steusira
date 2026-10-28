@@ -35,6 +35,9 @@
 
 html, body { height: 100%; margin: 0; }
 
+/* Platz für die Scrollbar immer reservieren: der Inhalt verschiebt sich nicht, wenn sie erscheint. */
+html { scrollbar-gutter: stable; }
+
 body {
   display: flex;
   flex-direction: column;
@@ -335,18 +338,16 @@ main.fragebogen { justify-content: flex-start; max-width: 36rem; }
   font-size: 0.875rem;
   font-variant-numeric: tabular-nums;
 }
-.zurueck {
-  padding: 0.25rem 0;
-  border: 0;
-  background: none;
-  color: var(--accent);
-  font: inherit;
-  cursor: pointer;
-}
-.segmente { display: flex; gap: 0.25rem; margin: 0.25rem 0 0; padding: 0; list-style: none; }
-.segmente li { flex: 1; height: 0.375rem; border-radius: 0.1875rem; background: var(--track); }
-.segmente li.erledigt { background: var(--accent); }
-.segmente li.aktiv { background: color-mix(in srgb, var(--accent) 45%, var(--track)); }
+/* Ein Segment hat eine höhere Klickfläche als der sichtbare Balken (::after). */
+.segmente { display: flex; gap: 0.25rem; margin: -0.125rem 0 -0.375rem; padding: 0; list-style: none; }
+.segmente li { flex: 1; display: flex; }
+.seg { flex: 1; display: flex; align-items: center; height: 1.125rem; padding: 0; border: 0; background: none; }
+.seg::after { content: ""; flex: 1; height: 0.375rem; border-radius: 0.1875rem; background: var(--track); }
+.erledigt .seg::after { background: var(--accent); }
+.aktiv .seg::after { background: color-mix(in srgb, var(--accent) 45%, var(--track)); }
+button.seg { cursor: pointer; }
+button.seg:hover::after { background: color-mix(in srgb, var(--accent) 70%, var(--fg)); }
+button.seg:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; border-radius: 0.25rem; }
 
 .schritt[hidden] { display: none; }
 .frage { height: 7.5rem; overflow: hidden; }
@@ -354,7 +355,7 @@ main.fragebogen { justify-content: flex-start; max-width: 36rem; }
 .frage p { margin: 0; color: var(--muted); font-size: 0.9375rem; line-height: 1.45; }
 
 .wahl { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
-.wahl button, .weiter {
+.wahl button, .weiter, .zurueck {
   min-height: 3.5rem;
   padding: 0.5rem 0.75rem;
   border: 1px solid var(--border);
@@ -366,7 +367,7 @@ main.fragebogen { justify-content: flex-start; max-width: 36rem; }
   cursor: pointer;
 }
 .wahl button:hover { border-color: var(--accent); }
-.wahl button:focus-visible, .weiter:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.wahl button:focus-visible, .weiter:focus-visible, .zurueck:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .wahl button[aria-pressed="true"] { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 12%, var(--surface)); }
 .laender { gap: 0.5rem; }
 .laender button { min-height: 2.75rem; font-size: 0.9375rem; line-height: 1.2; }
@@ -374,10 +375,13 @@ main.fragebogen { justify-content: flex-start; max-width: 36rem; }
 .besoldung { grid-template-columns: repeat(4, 1fr); gap: 0.5rem; }
 .besoldung button { min-height: 2.75rem; font-variant-numeric: tabular-nums; }
 
+/* Zurück und Weiter stehen unten rechts, unter dem Inhalt oder am unteren Rand der Ansicht. */
+#fragebogen { flex: 1; display: flex; flex-direction: column; }
+.fb-nav { display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: auto; padding-top: 1.5rem; }
+.fb-nav button { min-width: 8rem; }
+.fb-nav button[hidden] { display: none; }
+.zurueck:hover { border-color: var(--accent); }
 .weiter {
-  display: block;
-  width: 100%;
-  margin-top: 1.25rem;
   border-color: var(--accent);
   background: var(--accent);
   color: var(--surface);
@@ -387,7 +391,6 @@ main.fragebogen { justify-content: flex-start; max-width: 36rem; }
 .folge { display: flex; flex-direction: column; gap: 0.375rem; margin-top: 1.25rem; }
 .folge[hidden] { display: none; }
 .folge label { font-size: 0.9375rem; font-weight: 500; }
-.folge .weiter { margin-top: 0.5rem; }
 
 .paar { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
 
