@@ -184,8 +184,8 @@ Sozialversicherungspflichtig Beschäftigte on 31 December 2025, total 34,985,555
 | 1    | Land-, Forst- und Tierwirtschaft und Gartenbau                       |    491,652 | privat           |
 | 0    | Militär, sonstige / keine Angabe                                     |    171,988 | öffentlich (1)   |
 
-1. Soldaten are not sozialversicherungspflichtig. This row contains mainly "keine Angabe" and is not a count of
-   the armed forces.
+1. Soldaten are not sozialversicherungspflichtig. This row contains mainly "keine Angabe" and is not a
+   count of the armed forces.
 
 
 ## Open Points
