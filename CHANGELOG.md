@@ -1,5 +1,30 @@
 # Changelog
 
+## 2026.10005
+
+Step-by-step questionnaire at `/fragebogen` (no plan).
+
+- `public/fragebogen.html`, `public/fragebogen.js`: one question per view, in this order: Verheiratet,
+  Kinder (with the number of children), Kirchensteuer, Krankenversicherung, Bundesland, Haushaltseinkommen,
+  Raucher (with packs per week), Wohnraum (m² and Kaltmiete). A progress bar with 8 segments and a back button
+  are at the top. A summary page shows the total burden, all answers with links to change them, and a link to
+  the detailed calculator with the answers in the URL hash.
+- The question area has a fixed height. The default answer ("Nein", "Gesetzlich") is always the right button at
+  the same position, and it has the focus. A user can answer the first four questions with the Enter key or
+  four clicks at the same place.
+- Bundesland: 16 buttons of equal size in two columns. Bayern and Baden-Württemberg use 8 % Kirchensteuer, the
+  other states 9 %.
+- `public/einkommen.js`: Netto (Arbeitnehmer), Brutto (Arbeitnehmer) and Brutto (Arbeitgeber), each per month
+  and per year. The field that the user edits is fixed. Its pair (month times 12) follows directly; the
+  other four fields are derived with `steuern.js` (inverse by bisection) and show "*Vorläufige Schätzung".
+  Assumptions: one earner, statutory health insurance also for "Privat", no special payments.
+- `public/index.html`: link to the questionnaire.
+- Not yet used in the calculation: Krankenversicherung "Privat", Wohnfläche and Kaltmiete.
+- Validation: `npm test` (19 tests, all pass; 5 new in `test/einkommen.test.js`). Manual check in headless
+  Chromium at 1280 px and 390 px width: the default buttons of the first four steps are at the same position
+  (Enter key only), the income fields derive as expected, and the summary shows no script errors.
+
+
 ## 2026.10004
 
 Remove the personal name from the website content (no plan).
