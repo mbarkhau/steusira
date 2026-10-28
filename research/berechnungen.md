@@ -57,8 +57,9 @@ negativ: die Bezüge abzüglich der formal gezahlten Steuern.
 ### Weniger eindeutige Fälle: Beamte und öffentlicher Dienst
 
 Bei Beamten und Angestellten im öffentlichen Dienst ist die Antwort weniger eindeutig. Formal zahlen sie
-Lohnsteuer. Ihr Gehalt kommt aber aus Steuern (siehe [berufsgruppen-finanzierung.md](berufsgruppen-finanzierung.md)).
-Für die Lohnsteuer gilt deshalb dasselbe Argument wie für die Mehrwertsteuer des Sozialhilfeempfängers: der
+Lohnsteuer. Ihr Gehalt kommt aber aus Steuern
+(siehe [berufsgruppen-finanzierung.md](berufsgruppen-finanzierung.md)). Für die Lohnsteuer gilt deshalb
+dasselbe Argument wie für die Mehrwertsteuer des Sozialhilfeempfängers: der
 Staat zahlt ein Bruttogehalt aus und nimmt einen Teil davon sofort wieder ein. Der Staat könnte ebenso ein
 niedrigeres, steuerfreies Gehalt zahlen.
 
