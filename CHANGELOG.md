@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026.10003
+
+Label of the draft year (no plan).
+
+- `public/rechner.js`: the year selector shows "2027*" instead of "2027 (Entwurf)".
+- `public/index.html`: new footer text "*Zahlen unter Vorbehalt".
+- Validation: `node --test`, 14 of 14 pass.
+
+
 ## 2026.10002
 
 Selection of the tax year: 2024, 2025, 2026 and 2027 (no plan).

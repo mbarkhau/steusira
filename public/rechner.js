@@ -210,7 +210,7 @@ function baueFeld(f, zustand, p) {
 function baueJahrwahl(zustand) {
   const optionen = JAHRE.map((jahr) => el("label", {},
     el("input", { type: "radio", name: "jahr", value: jahr, checked: zustand.jahr === jahr }),
-    el("span", { text: parameter(jahr).entwurf ? `${jahr} (Entwurf)` : String(jahr) })));
+    el("span", { text: parameter(jahr).entwurf ? `${jahr}*` : String(jahr) })));
   return el("div", { class: "jahrwahl", role: "radiogroup", "aria-labelledby": "jahrwahl-titel" },
     el("span", { id: "jahrwahl-titel", text: "Steuerjahr" }),
     el("div", { class: "jahre" }, ...optionen));
