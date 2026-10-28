@@ -153,6 +153,32 @@ const JAHRE_ABWEICHUNG = {
   },
 };
 
+// Grundsteuer B und Grunderwerbsteuer je m² Wohnfläche und Jahr: Aufkommen 2025 des Landes geteilt durch
+// die bewohnte Wohnfläche des Landes (Mikrozensus 2022). Ein künstlicher Kennwert: er verteilt auch die
+// Steuer auf Gewerbeimmobilien nach der Wohnfläche auf die Haushalte. Die Werte gelten für alle Jahre.
+// Quelle und Rechnung: research/grundsteuer_laender.py
+export const LAENDER = {
+  DE: { name: "Durchschnitt Deutschland", grundsteuer: 4.23, grunderwerbsteuer: 4.03, wohnflaeche: 96 },
+  BW: { name: "Baden-Württemberg", grundsteuer: 4.02, grunderwerbsteuer: 4.31, wohnflaeche: 100.5 },
+  BY: { name: "Bayern", grundsteuer: 3.23, grunderwerbsteuer: 3.1, wohnflaeche: 101.2 },
+  BE: { name: "Berlin", grundsteuer: 6.61, grunderwerbsteuer: 7.16, wohnflaeche: 74.8 },
+  BB: { name: "Brandenburg", grundsteuer: 2.7, grunderwerbsteuer: 4.58, wohnflaeche: 90.1 },
+  HB: { name: "Bremen", grundsteuer: 7.92, grunderwerbsteuer: 4.14, wohnflaeche: 82.5 },
+  HH: { name: "Hamburg", grundsteuer: 7.62, grunderwerbsteuer: 7.69, wohnflaeche: 76.5 },
+  HE: { name: "Hessen", grundsteuer: 4.87, grunderwerbsteuer: 4.9, wohnflaeche: 100.4 },
+  MV: { name: "Mecklenburg-Vorpommern", grundsteuer: 3, grunderwerbsteuer: 3.32, wohnflaeche: 85.1 },
+  NI: { name: "Niedersachsen", grundsteuer: 4.19, grunderwerbsteuer: 3.39, wohnflaeche: 106.8 },
+  NW: { name: "Nordrhein-Westfalen", grundsteuer: 5.32, grunderwerbsteuer: 4.46, wohnflaeche: 94.6 },
+  RP: { name: "Rheinland-Pfalz", grundsteuer: 3.25, grunderwerbsteuer: 3.09, wohnflaeche: 109.8 },
+  SL: { name: "Saarland", grundsteuer: 3.11, grunderwerbsteuer: 3.15, wohnflaeche: 113.3 },
+  SN: { name: "Sachsen", grundsteuer: 3.37, grunderwerbsteuer: 3.02, wohnflaeche: 81 },
+  ST: { name: "Sachsen-Anhalt", grundsteuer: 2.81, grunderwerbsteuer: 2.25, wohnflaeche: 86.4 },
+  SH: { name: "Schleswig-Holstein", grundsteuer: 3.8, grunderwerbsteuer: 5.33, wohnflaeche: 96.2 },
+  TH: { name: "Thüringen", grundsteuer: 2.82, grunderwerbsteuer: 1.6, wohnflaeche: 87.5 },
+};
+
+export const land = (kurz) => LAENDER[kurz] || LAENDER.DE;
+
 export const JAHRE = Object.keys(JAHRE_ABWEICHUNG).map(Number);
 
 export const PARAMETER = Object.fromEntries(JAHRE.map((jahr) =>
@@ -244,7 +270,8 @@ export const STANDARD = {
   konsum19: 350,
   konsum7: 40,
 
-  grundsteuer: 300,
+  land: "DE",
+  wohnflaeche: 96, // Durchschnitt je Wohnung, Mikrozensus 2022
   stromKwh: 2000,
   stromPreis: 38,
   gasKwh: 0,
@@ -367,8 +394,11 @@ export function berechne(eingabe) {
   const strom = (e.stromKwh * e.stromPreis) / 100;
   const gas = (e.gasKwh * e.gasPreis) / 100;
   const heizoel = e.heizoelL * e.heizoelPreis;
-  ausgabe(wohnen, strom + gas + heizoel + e.grundsteuer);
-  add("konsum", "Grundsteuer", wohnen, e.grundsteuer);
+  // Mieter zahlen die Grundsteuer über die Nebenkosten, die Grunderwerbsteuer nur indirekt über die Miete.
+  const grundsteuer = e.wohnflaeche * land(e.land).grundsteuer;
+  ausgabe(wohnen, strom + gas + heizoel + grundsteuer);
+  add("konsum", "Grundsteuer", wohnen, grundsteuer);
+  add("konsum", "Grunderwerbsteuer (anteilig)", wohnen, e.wohnflaeche * land(e.land).grunderwerbsteuer);
   add("konsum", "Stromsteuer", wohnen, e.stromKwh * p.stromsteuerKwh);
   add("konsum", "Umsatzsteuer", wohnen, ust(strom + gas + heizoel, p.ust));
   add("konsum", "Energiesteuer", wohnen, e.gasKwh * p.energieGasKwh + e.heizoelL * p.energieHeizoelL);

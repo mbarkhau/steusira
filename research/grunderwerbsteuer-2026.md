@@ -118,16 +118,19 @@ Per year of ownership: with a typical period of ownership of 20 years, the Grund
 about 1,050 € per year. In the high-rate Länder, this is more than the yearly Grundsteuer on the same flat.
 
 
-## Proposal for the Calculator
+## Use in the Calculator
 
-The Grunderwerbsteuer applies only to owners, and only once. A calculator for the yearly tax burden can
-distribute it over the years of ownership:
+Since version 2026.10008, the calculator adds an anteilige Grunderwerbsteuer for all households, also for
+tenants: Wohnfläche × (Grunderwerbsteuer revenue of the Land in 2025 / inhabited Wohnfläche of the Land).
+Average: 4.03 €/m² per year, from 1.60 €/m² in Thüringen to 7.69 €/m² in Hamburg. See the section
+"Kennwert per m² Wohnfläche" in `grundsteuer-2025.md` for the data and the table of all Länder.
+
+A more exact calculation for owners distributes the tax over the years of ownership:
 
     Grunderwerbsteuer per year = Kaufpreis × rate of the Land / years of ownership
 
 The questionnaire does not ask about property at this time. Questions for a later extension: Wohneigentum
-(yes / no), year of purchase, purchase price. Without these answers, the calculator can use 0 € for tenants.
-Tenants pay the Grunderwerbsteuer only indirectly, through the rent.
+(yes / no), year of purchase, purchase price.
 
 
 ## Sources

@@ -1,4 +1,4 @@
-import { berechne } from "./steuern.js";
+import { berechne, land } from "./steuern.js";
 import { ableiten, FELDER, partner } from "./einkommen.js";
 
 const euro = new Intl.NumberFormat("de-DE", { maximumFractionDigits: 0 });
@@ -264,7 +264,10 @@ for (const feld of FELDER) {
 function zeigeErgebnis() {
   const l = lage();
   const werte = ableiten(antwort.einkommen.feld, antwort.einkommen.wert, l);
-  const eingabe = { brutto: werte.bruttoJahr, ...l, zigaretten: schachteln() };
+  const flaeche = liesZahl(form.elements.flaeche.value);
+  const eingabe = { brutto: werte.bruttoJahr, ...l, zigaretten: schachteln(), land: antwort.land ?? "DE" };
+  // Ohne Angabe gilt die durchschnittliche Wohnfläche je Wohnung im Bundesland.
+  eingabe.wohnflaeche = flaeche ?? land(eingabe.land).wohnflaeche;
   const r = berechne(eingabe);
 
   document.getElementById("fb-gesamt").textContent = `${euro.format(r.nachKindergeld)} €`;
@@ -273,7 +276,6 @@ function zeigeErgebnis() {
 
   const land = LAENDER.find(([kurz]) => kurz === antwort.land)?.[1] ?? "–";
   const jaNein = (x) => (x === "ja" ? "Ja" : "Nein");
-  const flaeche = liesZahl(form.elements.flaeche.value);
   const miete = liesEuro(form.elements.kaltmiete.value);
   const geboren = jahr("geburtsjahr");
   const eintritt = jahr("berufseintritt");
@@ -303,6 +305,8 @@ function zeigeErgebnis() {
   if (l.kinder) params.set("kinder", String(l.kinder));
   if (l.kirche) params.set("kirche", String(l.kirche));
   if (eingabe.zigaretten) params.set("zigaretten", String(eingabe.zigaretten));
+  params.set("land", eingabe.land);
+  params.set("wohnflaeche", String(eingabe.wohnflaeche));
   document.getElementById("zum-rechner").href = `/#${params}`;
 }
 

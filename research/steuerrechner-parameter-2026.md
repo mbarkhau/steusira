@@ -60,8 +60,10 @@ that differ in 2024, 2025 and 2027.
   Emission factors: Benzin 2.37 kg/l, Diesel 2.65 kg/l, Heizöl 2.676 kg/l, Erdgas 0.182 kg/kWh (Hs). Source:
   §10 BEHG and [20]. The auction result is not verified.
 - **Rundfunkbeitrag.** 18.36 € per month and household. Source: [21].
-- **Grundsteuer.** Revenue of Grundsteuer B in 2025 was 15.8 billion euro, about 380 € per household
-  including business property. The calculator uses 300 € per household as the default. Source: [22].
+- **Grundsteuer and Grunderwerbsteuer.** Revenue of Grundsteuer B in 2025 was 15.8 billion euro, the
+  Grunderwerbsteuer 15.1 billion euro. The calculator uses a Kennwert per m² Wohnfläche by Bundesland:
+  on average 4.23 €/m² (Grundsteuer) and 4.03 €/m² (anteilige Grunderwerbsteuer) per year. Default
+  Wohnfläche: 96 m². Source: [22] and `grundsteuer-2025.md`, section "Kennwert per m² Wohnfläche".
 
 
 ## Other Years

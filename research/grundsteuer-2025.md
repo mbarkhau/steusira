@@ -183,15 +183,60 @@ to 3 €/m² per year. This agrees with the Betriebskostenspiegel. For a househo
 110 to 220 € per year. Houses with a large plot pay more, especially in Baden-Württemberg.
 
 
-## Proposal for the Calculator
+## Kennwert per m² Wohnfläche (used in the Calculator)
 
-A simple estimate that uses only the answers of the questionnaire:
+Since version 2026.10008, `public/steuern.js` calculates the Grundsteuer and an anteilige Grunderwerbsteuer
+from the Bundesland and the Wohnfläche:
 
-    Grundsteuer per year ≈ Wohnfläche × rate per m² and year (by Bundesland)
+    Kennwert of the Land = tax revenue of the Land in 2025 / inhabited Wohnfläche of the Land
+    Tax of the household = Wohnfläche of the household × Kennwert
 
-The rate per state can come from the example calculations above, with a default of about 2.4 €/m² per year
-(0.20 €/m² per month). A more exact calculation needs the Gemeinde (Hebesatz, Mietniveaustufe) and the
-Baujahr. That is not in the questionnaire at this time.
+This is an artificial value. It distributes all revenue to the households in proportion to their Wohnfläche,
+also the tax on commercial property and on transactions of companies. For the Grundsteuer, the Kennwert is
+thus about twice the value that a tenant pays with the Nebenkosten (compare the example calculations in
+`grundsteuer-2025.md`). The script `grundsteuer_laender.py` calculates the values.
+
+Data:
+
+- **Grunderwerbsteuer 2025 by Land:** the actual revenue ("nachrichtlich: Aufkommen", row 8.3) in the
+  vorläufige Abrechnung of the Finanzkraftausgleich 2025 by the BMF [F1]. Total: 15,097 million euro.
+- **Grundsteuer B 2025 by Land:** there is no public table of the actual revenue by Land for 2025. Destatis
+  publishes the 2025 data only in GENESIS, which now requires a login. Approximation: Grundbetrag 2024 of the
+  Land (row 14, same source) × Hebesatz of the Land (2022, average of the Gemeinden weighted by population
+  [F2]), scaled to the total revenue of 15,850 million euro. The reform of 2025 was mostly
+  aufkommensneutral for each Gemeinde, so the distribution by Land changed little.
+- **Wohnfläche by Land:** Mikrozensus 2022, Haushalte × average Wohnfläche per Wohnung [F3]. This is the
+  inhabited Wohnfläche (3,743 million m²). The Wohnungsbestand of Destatis (4,100 million m², end of 2025)
+  also contains empty flats. The average Wohnfläche per Wohnung of the Land is the default in the
+  questionnaire when the user does not give the Wohnfläche.
+
+| Land | Wohnfläche (million m²) | Grundsteuer B (million €) | €/m² | Grunderwerbsteuer (million €) | €/m² |
+| ---- | ----------------------- | ------------------------- | ---- | ----------------------------- | ---- |
+| BB   | 111.8                   | 301.6                     | 2.70 | 512.4                         | 4.58 |
+| BE   | 138.4                   | 915.1                     | 6.61 | 990.9                         | 7.16 |
+| BW   | 501.6                   | 2,015.8                   | 4.02 | 2,162.0                       | 4.31 |
+| BY   | 614.1                   | 1,986.1                   | 3.23 | 1,904.6                       | 3.10 |
+| HB   | 28.1                    | 222.9                     | 7.92 | 116.4                         | 4.14 |
+| HE   | 285.5                   | 1,390.3                   | 4.87 | 1,399.7                       | 4.90 |
+| HH   | 69.0                    | 525.9                     | 7.62 | 530.8                         | 7.69 |
+| MV   | 68.4                    | 205.4                     | 3.00 | 227.2                         | 3.32 |
+| NI   | 376.0                   | 1,577.4                   | 4.19 | 1,274.2                       | 3.39 |
+| NW   | 805.7                   | 4,284.6                   | 5.32 | 3,592.7                       | 4.46 |
+| RP   | 204.8                   | 665.0                     | 3.25 | 633.2                         | 3.09 |
+| SH   | 136.7                   | 518.9                     | 3.80 | 728.7                         | 5.33 |
+| SL   | 54.8                    | 170.8                     | 3.11 | 172.9                         | 3.15 |
+| SN   | 163.9                   | 552.1                     | 3.37 | 495.5                         | 3.02 |
+| ST   | 93.6                    | 262.5                     | 2.81 | 210.8                         | 2.25 |
+| TH   | 90.7                    | 255.6                     | 2.82 | 145.2                         | 1.60 |
+| DE   | 3,743.1                 | 15,850.0                  | 4.23 | 15,097.0                      | 4.03 |
+
+Sources:
+
+- [F1] BMF, Umsatzsteuerverteilung und Finanzkraftausgleich 2025, vorläufige Abrechnung:
+  https://www.bundesfinanzministerium.de/Content/DE/Downloads/Oeffentliche-Finanzen/Foederale-Finanzbeziehungen/Bundestaatlicher-Finanzausgleich/abrechnung-ausgleichsjahr-2025.pdf
+- [F2] Statistische Ämter des Bundes und der Länder, Hebesätze der Realsteuern 2022 (Excel):
+  https://www.statistikportal.de/de/veroeffentlichungen/hebesaetze-der-realsteuern-deutschland
+- [F3] Statistikportal, Wohnen 2022 (Mikrozensus): https://www.statistikportal.de/de/wohnen
 
 
 ## Sources

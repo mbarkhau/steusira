@@ -1,5 +1,31 @@
 # Changelog
 
+## 2026.10008
+
+Grundsteuer and anteilige Grunderwerbsteuer by Bundesland and Wohnfläche (no plan).
+
+- `public/steuern.js`: new table `LAENDER` with a Kennwert per m² Wohnfläche and year for each Land: tax
+  revenue 2025 of the Land divided by the inhabited Wohnfläche of the Land. Grundsteuer: 2.70 €/m²
+  (Brandenburg) to 7.92 €/m² (Bremen), average 4.23 €/m². Grunderwerbsteuer: 1.60 €/m² (Thüringen) to
+  7.69 €/m² (Hamburg), average 4.03 €/m². The fixed Grundsteuer of 300 € per household is removed. The new
+  inputs are `land` (default `DE`, the average for Germany) and `wohnflaeche` (default 96 m²). The
+  Grunderwerbsteuer is a new item "Grunderwerbsteuer (anteilig)" in "Wohnen und Energie". It is not part of
+  the expenses, because tenants pay it only indirectly through the rent.
+- `public/rechner.js`: the field Grundsteuer is replaced by the fields Bundesland and Wohnfläche. The note
+  below the Wohnfläche shows the two Kennwerte of the selected Land.
+- `public/fragebogen.js`: the questionnaire passes the Bundesland and the Wohnfläche to the calculation and
+  to the link to the calculator. Without a Wohnfläche, it uses the average Wohnfläche per Wohnung of the Land.
+- Data and derivation: `research/grundsteuer_laender.py`, `research/grundsteuer-2025.md` (section "Kennwert
+  per m² Wohnfläche"). Sources: BMF Finanzkraftausgleich 2025 (Grunderwerbsteuer by Land, Grundbetrag of the
+  Grundsteuer B), Hebesätze der Realsteuern 2022, Mikrozensus 2022 (Wohnfläche). The Grundsteuer B by Land
+  is an approximation, because no public table of the actual revenue by Land for 2025 exists.
+- Effect for the default household (50,000 € brutto, 96 m²): Steuern auf Konsum from 2,408 € to 2,901 €.
+- Validation: `npm test` (21 tests, all pass). Manual check in headless Chromium at 1280 px and 390 px width:
+  the calculator reads `land` and `wohnflaeche` from the URL hash, the note changes with the Land, no
+  horizontal scroll and no script errors. The questionnaire (Berlin, 70 m², 50,000 €) shows 21,031 €, the
+  same value as the calculator with the generated link `/#brutto=50000&land=BE&wohnflaeche=70`.
+
+
 ## 2026.10007
 
 Questionnaire: navigation with Zurück and Weiter, clickable progress segments, no scrollbar reflow (no plan).

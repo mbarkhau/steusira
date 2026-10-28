@@ -1,4 +1,4 @@
-import { berechne, JAHRE, parameter, standard, STANDARD } from "./steuern.js";
+import { berechne, JAHRE, land, LAENDER, parameter, standard, STANDARD } from "./steuern.js";
 
 const euro = new Intl.NumberFormat("de-DE", { maximumFractionDigits: 0 });
 const prozent = new Intl.NumberFormat("de-DE", { style: "percent", maximumFractionDigits: 1 });
@@ -59,8 +59,10 @@ const ABSCHNITTE = [
     titel: "Wohnen und Energie",
     bereiche: ["Wohnen und Energie"],
     felder: [
-      { id: "grundsteuer", label: "Grundsteuer", einheit: "€/Jahr", step: 10,
-        hinweis: "Mieter zahlen sie über die Nebenkosten." },
+      { id: "land", label: "Bundesland", typ: "auswahl",
+        optionen: Object.entries(LAENDER).map(([kurz, l]) => [kurz, l.name]) },
+      { id: "wohnflaeche", label: "Wohnfläche", einheit: "m²", step: 5,
+        hinweis: "Grundsteuer und anteilige Grunderwerbsteuer" },
       { id: "stromKwh", label: "Strom", einheit: "kWh/Jahr", step: 100,
         preis: { id: "stromPreis", einheit: "ct/kWh", step: 1 } },
       { id: "gasKwh", label: "Erdgas", einheit: "kWh/Jahr", step: 500,
@@ -133,6 +135,7 @@ function ladeZustand() {
     if (key === "jahr") continue;
     if (!(key in STANDARD)) continue;
     if (typeof STANDARD[key] === "boolean") zustand[key] = wert === "1";
+    else if (key === "land") zustand.land = wert in LAENDER ? wert : STANDARD.land;
     else if (Number.isFinite(Number(wert))) zustand[key] = Number(wert);
   }
   return zustand;
@@ -155,6 +158,7 @@ function liesFormular() {
     const el = form.elements[key];
     if (!el) continue;
     if (el.type === "checkbox") zustand[key] = el.checked;
+    else if (typeof STANDARD[key] === "string") zustand[key] = el.value;
     else zustand[key] = Math.max(0, Number(el.value.replace(",", ".")) || 0);
   }
   return zustand;
@@ -366,6 +370,11 @@ function aktualisiere() {
       form.querySelector(`[data-feld="${f.id}"]`).hidden = !f.wenn(zustand);
     }
   }
+  const l = land(zustand.land);
+  const cent = (x) => komma(x.toFixed(2));
+  form.querySelector('[data-hinweis="wohnflaeche"]').textContent = `Pro Jahr: Grundsteuer ${cent(l.grundsteuer)} €/m², `
+    + `anteilige Grunderwerbsteuer ${cent(l.grunderwerbsteuer)} €/m². `
+    + `${zustand.land === "DE" ? "Durchschnitt Deutschland" : `Durchschnitt ${l.name}`}.`;
   speichereZustand(zustand);
   zeigeErgebnis(berechne(zustand));
 }

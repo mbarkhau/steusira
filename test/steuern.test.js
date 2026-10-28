@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import {
-  berechne, einkommensteuer, JAHRE, PARAMETER, soli, sozialabgaben, standard, tabakSchachtel, tarif,
+  berechne, einkommensteuer, JAHRE, LAENDER, PARAMETER, soli, sozialabgaben, standard, tabakSchachtel, tarif,
 } from "../public/steuern.js";
 
 test("Tarif 2026 an den Zonengrenzen", () => {
@@ -114,4 +114,25 @@ test("Tabaksteuer 2027", () => {
   const p = PARAMETER[2027];
   assert.ok(tabakSchachtel(9, p) > tabakSchachtel(9));
   assert.ok(Math.abs(tabakSchachtel(12, p) - (20 * 0.1434 + 0.2105 * 12)) < 1e-9);
+});
+
+test("Grundsteuer und anteilige Grunderwerbsteuer nach Bundesland und Wohnfläche", () => {
+  const betrag = (r, art) => r.posten.find((p) => p.art === art).betrag;
+  const de = berechne({});
+  assert.equal(betrag(de, "Grundsteuer"), 406.08);
+  assert.equal(betrag(de, "Grunderwerbsteuer (anteilig)"), 386.88);
+  const be = berechne({ land: "BE", wohnflaeche: 70 });
+  assert.equal(betrag(be, "Grundsteuer"), 462.7);
+  assert.equal(betrag(be, "Grunderwerbsteuer (anteilig)"), 501.2);
+  const ohne = berechne({ land: "BE", wohnflaeche: 0 });
+  assert.ok(Math.abs(be.ausgaben["Wohnen und Energie"] - ohne.ausgaben["Wohnen und Energie"] - 462.7) < 1e-9);
+  assert.equal(betrag(berechne({ land: "XX", wohnflaeche: 96 }), "Grundsteuer"), betrag(de, "Grundsteuer"));
+});
+
+test("Kennwerte je Land liegen um den Bundesdurchschnitt", () => {
+  for (const [kurz, l] of Object.entries(LAENDER)) {
+    assert.ok(l.grundsteuer > 2 && l.grundsteuer < 9, kurz);
+    assert.ok(l.grunderwerbsteuer > 1 && l.grunderwerbsteuer < 9, kurz);
+    assert.ok(l.wohnflaeche > 70 && l.wohnflaeche < 120, kurz);
+  }
 });
