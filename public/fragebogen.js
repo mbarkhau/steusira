@@ -17,6 +17,21 @@ const LAENDER = [
 ];
 const kirchensatz = (land) => (land === "BW" || land === "BY" ? 0.08 : 0.09);
 
+const BERUFE = {
+  selbststaendig: "Selbstständig",
+  privat: "Angestellt, Privatwirtschaft",
+  sozial: "Angestellt, Gesundheit, Pflege, Soziales",
+  oeffentlich: "Angestellt, öffentlicher Dienst",
+  beamte: "Beamte, Richter, Soldaten",
+  keine: "Nicht erwerbstätig",
+};
+
+// Besoldungsordnung A (Laufbahnen), B (Spitzenämter), R (Richter, Staatsanwälte), W (Professoren)
+const BESOLDUNG = [
+  ...Array.from({ length: 14 }, (_, i) => `A${i + 3}`),
+  "B", "R1", "R2", "R3+", "W2", "W3",
+];
+
 const EINKOMMEN_ZEILEN = [
   ["netto", "Netto (Arbeitnehmer)"],
   ["brutto", "Brutto (Arbeitnehmer)"],
@@ -25,12 +40,14 @@ const EINKOMMEN_ZEILEN = [
 
 const form = document.getElementById("fragebogen");
 const schritte = [...form.querySelectorAll(".schritt")];
-const fragen = schritte.filter((s) => s.dataset.schritt !== "ergebnis");
+// Die Besoldungsgruppe fragt der Fragebogen nur bei Beamten ab.
+const aktiv = (s) => s.dataset.schritt !== "besoldung" || antwort.beruf === "beamte";
+const fragen = () => schritte.filter((s) => aktiv(s) && s.dataset.schritt !== "ergebnis");
 const segmente = document.getElementById("segmente");
 const zurueck = document.getElementById("zurueck");
 
 const antwort = {
-  verheiratet: null, kinder: null, kirche: null, kv: null, land: null, raucher: null,
+  verheiratet: null, kinder: null, kirche: null, kv: null, land: null, beruf: null, besoldung: null, raucher: null,
   einkommen: null, // { feld, wert }: das Feld, das der Nutzer zuletzt bearbeitet hat
 };
 let aktuell = 0;
@@ -46,6 +63,10 @@ const liesZahl = (text) => {
 };
 
 const kinderAnzahl = () => (antwort.kinder === "ja" ? Math.round(liesZahl(form.elements.kinderAnzahl.value) ?? 0) : 0);
+const jahr = (name) => {
+  const x = liesZahl(form.elements[name].value);
+  return x !== null && Number.isInteger(x) ? x : null;
+};
 const schachteln = () => (antwort.raucher === "ja" ? liesZahl(form.elements.schachteln.value) ?? 0 : 0);
 
 function lage() {
@@ -58,15 +79,15 @@ function lage() {
 
 // --- Aufbau ---
 
-for (let i = 0; i < fragen.length; i++) segmente.append(document.createElement("li"));
-
-document.getElementById("laender").append(...LAENDER.map(([kurz, name]) => {
+const wahlButton = (wert, text) => {
   const b = document.createElement("button");
   b.type = "button";
-  b.dataset.wert = kurz;
-  b.textContent = name;
+  b.dataset.wert = wert;
+  b.textContent = text;
   return b;
-}));
+};
+document.getElementById("laender").append(...LAENDER.map(([kurz, name]) => wahlButton(kurz, name)));
+document.getElementById("besoldung").append(...BESOLDUNG.map((g) => wahlButton(g, g)));
 
 document.getElementById("einkommen-felder").append(...EINKOMMEN_ZEILEN.map(([art, label]) => {
   const tr = document.createElement("tr");
@@ -89,12 +110,17 @@ function zeige(index) {
   const schritt = schritte[index];
   const fertig = schritt.dataset.schritt === "ergebnis";
 
-  [...segmente.children].forEach((li, i) => {
-    li.className = i < index ? "erledigt" : i === index ? "aktiv" : "";
-  });
+  const liste = fragen();
+  const position = fertig ? liste.length : liste.indexOf(schritt);
+  segmente.replaceChildren(...liste.map((_, i) => {
+    const li = document.createElement("li");
+    li.className = i < position ? "erledigt" : i === position ? "aktiv" : "";
+    return li;
+  }));
   const fortschritt = document.getElementById("fortschritt");
-  fortschritt.setAttribute("aria-valuenow", String(Math.min(index + 1, fragen.length)));
-  document.getElementById("schritt-text").textContent = fertig ? "Fertig" : `Schritt ${index + 1} von ${fragen.length}`;
+  fortschritt.setAttribute("aria-valuemax", String(liste.length));
+  fortschritt.setAttribute("aria-valuenow", String(Math.min(position + 1, liste.length)));
+  document.getElementById("schritt-text").textContent = fertig ? "Fertig" : `Schritt ${position + 1} von ${liste.length}`;
   zurueck.style.visibility = index === 0 ? "hidden" : "visible";
 
   if (schritt.dataset.schritt === "einkommen") aktualisiereEinkommen();
@@ -112,15 +138,22 @@ function fokus(schritt) {
     return;
   }
   if (name === "einkommen") return form.elements[antwort.einkommen?.feld ?? "nettoMonat"].focus();
+  if (name === "lebenslauf") return form.elements.geburtsjahr.focus();
   if (name === "wohnraum") return form.elements.flaeche.focus();
   if (name === "ergebnis") return document.getElementById("zum-rechner").focus();
   const gewaehlt = schritt.querySelector(`.wahl button[data-wert="${antwort[name]}"]`);
   (gewaehlt ?? schritt.querySelector(".wahl [data-vorgabe]") ?? schritt.querySelector("button"))?.focus();
 }
 
-const weiter = () => zeige(Math.min(aktuell + 1, schritte.length - 1));
+// Nächster oder vorheriger Schritt, der für die bisherigen Antworten gilt
+function nachbar(richtung) {
+  let i = aktuell + richtung;
+  while (schritte[i] && !aktiv(schritte[i])) i += richtung;
+  return schritte[i] ? i : aktuell;
+}
+const weiter = () => zeige(nachbar(1));
 
-zurueck.addEventListener("click", () => zeige(Math.max(aktuell - 1, 0)));
+zurueck.addEventListener("click", () => zeige(nachbar(-1)));
 
 form.addEventListener("click", (event) => {
   const button = event.target.closest(".wahl button");
@@ -139,6 +172,7 @@ form.addEventListener("submit", (event) => {
   const name = schritte[aktuell].dataset.schritt;
   if (name === "einkommen" && !antwort.einkommen) return;
   if (name === "kinder" && antwort.kinder === "ja" && !kinderAnzahl()) return form.elements.kinderAnzahl.focus();
+  if (name === "lebenslauf" && !pruefeLebenslauf()) return;
   if (schritte[aktuell].querySelector(".folge[hidden]")) return;
   weiter();
 });
@@ -148,6 +182,29 @@ for (const schritt of schritte) {
     const ziel = event.target.closest("[data-gehe]");
     if (ziel) zeige(Number(ziel.dataset.gehe));
   });
+}
+
+// --- Geburtsjahr und Berufseintritt ---
+
+// Beide Felder sind optional. Ein Wert muss eine Jahreszahl sein, der Berufseintritt liegt nach der Geburt.
+function pruefeLebenslauf() {
+  const heute = new Date().getFullYear();
+  const geboren = jahr("geburtsjahr");
+  const eintritt = jahr("berufseintritt");
+  const leer = (name) => form.elements[name].value.trim() === "";
+  let fehler = null;
+  if (!leer("geburtsjahr") && (geboren === null || geboren < 1920 || geboren > heute - 14)) {
+    fehler = ["geburtsjahr", `Bitte ein Geburtsjahr zwischen 1920 und ${heute - 14} eingeben.`];
+  } else if (!leer("berufseintritt") && (eintritt === null || eintritt < 1930 || eintritt > heute)) {
+    fehler = ["berufseintritt", `Bitte ein Jahr zwischen 1930 und ${heute} eingeben.`];
+  } else if (geboren !== null && eintritt !== null && eintritt < geboren + 14) {
+    fehler = ["berufseintritt", "Der Berufseintritt liegt mindestens 14 Jahre nach dem Geburtsjahr."];
+  }
+  const hinweis = document.getElementById("lebenslauf-fehler");
+  hinweis.hidden = !fehler;
+  hinweis.textContent = fehler?.[1] ?? "";
+  if (fehler) form.elements[fehler[0]].focus();
+  return !fehler;
 }
 
 // --- Haushaltseinkommen ---
@@ -189,21 +246,28 @@ function zeigeErgebnis() {
   const jaNein = (x) => (x === "ja" ? "Ja" : "Nein");
   const flaeche = liesZahl(form.elements.flaeche.value);
   const miete = liesEuro(form.elements.kaltmiete.value);
+  const geboren = jahr("geburtsjahr");
+  const eintritt = jahr("berufseintritt");
+  const beruf = BERUFE[antwort.beruf] ?? "–";
   const zeilen = [
-    ["Verheiratet", jaNein(antwort.verheiratet)],
-    ["Kinder", antwort.kinder === "ja" ? String(l.kinder) : "Nein"],
-    ["Kirchensteuer", antwort.kirche === "ja" ? `Ja (${Math.round(l.kirche * 100)} %)` : "Nein"],
-    ["Krankenversicherung", antwort.kv === "privat" ? "Privat" : "Gesetzlich"],
-    ["Bundesland", land],
-    ["Brutto (Arbeitnehmer)", `${euro.format(werte.bruttoJahr)} € pro Jahr`],
-    ["Raucher", antwort.raucher === "ja" ? `${String(schachteln()).replace(".", ",")} Schachteln pro Woche` : "Nein"],
-    ["Wohnraum", [flaeche !== null && `${euro.format(flaeche)} m²`, miete !== null && `${euro.format(miete)} € kalt`]
+    ["verheiratet", "Verheiratet", jaNein(antwort.verheiratet)],
+    ["kinder", "Kinder", antwort.kinder === "ja" ? String(l.kinder) : "Nein"],
+    ["kirche", "Kirchensteuer", antwort.kirche === "ja" ? `Ja (${Math.round(l.kirche * 100)} %)` : "Nein"],
+    ["kv", "Krankenversicherung", antwort.kv === "privat" ? "Privat" : "Gesetzlich"],
+    ["land", "Bundesland", land],
+    ["beruf", "Berufsgruppe", beruf],
+    ...(antwort.beruf === "beamte" ? [["besoldung", "Besoldungsgruppe", antwort.besoldung ?? "–"]] : []),
+    ["lebenslauf", "Geburtsjahr", geboren ?? "–"],
+    ["lebenslauf", "Berufseintritt", eintritt === null ? "–"
+      : `${eintritt} (${Math.max(new Date().getFullYear() - eintritt, 0)} Jahre im Beruf)`],
+    ["einkommen", "Brutto (Arbeitnehmer)", `${euro.format(werte.bruttoJahr)} € pro Jahr`],
+    ["raucher", "Raucher", antwort.raucher === "ja" ? `${String(schachteln()).replace(".", ",")} Schachteln pro Woche` : "Nein"],
+    ["wohnraum", "Wohnraum", [flaeche !== null && `${euro.format(flaeche)} m²`, miete !== null && `${euro.format(miete)} € kalt`]
       .filter(Boolean).join(", ") || "–"],
   ];
-  const schrittVon = ["verheiratet", "kinder", "kirche", "kv", "land", "einkommen", "raucher", "wohnraum"];
-  document.getElementById("antworten").innerHTML = zeilen.map(([dt, dd], i) =>
+  document.getElementById("antworten").innerHTML = zeilen.map(([name, dt, dd]) =>
     `<div><dt>${dt}</dt><dd>${dd}</dd><dd><button type="button" class="aendern" data-gehe="${
-      schritte.findIndex((s) => s.dataset.schritt === schrittVon[i])}">ändern</button></dd></div>`).join("");
+      schritte.findIndex((s) => s.dataset.schritt === name)}">ändern</button></dd></div>`).join("");
 
   const params = new URLSearchParams({ brutto: String(werte.bruttoJahr) });
   if (l.verheiratet) params.set("verheiratet", "1");

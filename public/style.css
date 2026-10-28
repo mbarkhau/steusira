@@ -370,6 +370,9 @@ main.fragebogen { justify-content: flex-start; max-width: 36rem; }
 .wahl button[aria-pressed="true"] { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 12%, var(--surface)); }
 .laender { gap: 0.5rem; }
 .laender button { min-height: 2.75rem; font-size: 0.9375rem; line-height: 1.2; }
+.berufe button { font-size: 0.9375rem; line-height: 1.25; }
+.besoldung { grid-template-columns: repeat(4, 1fr); gap: 0.5rem; }
+.besoldung button { min-height: 2.75rem; font-variant-numeric: tabular-nums; }
 
 .weiter {
   display: block;

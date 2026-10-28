@@ -1,5 +1,28 @@
 # Changelog
 
+## 2026.10006
+
+Questionnaire: Berufsgruppe, Besoldungsgruppe, Geburtsjahr and Berufseintritt (no plan).
+
+- `public/fragebogen.html`, `public/fragebogen.js`: three new steps after Bundesland. The order is now:
+  Verheiratet, Kinder, Kirchensteuer, Krankenversicherung, Bundesland, Berufsgruppe, Besoldungsgruppe,
+  Geburtsjahr und Berufseintritt, Haushaltseinkommen, Raucher, Wohnraum.
+- Berufsgruppe: six buttons, grouped by the source of funding (see
+  `research/berufsgruppen-finanzierung.md`): Selbstständig, Angestellt in der Privatwirtschaft (default),
+  Angestellt in Gesundheit, Pflege, Soziales, Angestellt im öffentlichen Dienst, Beamte, Richter, Soldaten,
+  Nicht erwerbstätig.
+- Besoldungsgruppe: only for Beamte. 20 buttons in four columns: A3 to A16, B, R1, R2, R3+, W2, W3. For other
+  groups, the step is skipped. The progress bar shows 10 or 11 segments, depending on the Berufsgruppe.
+- Geburtsjahr und Berufseintritt: two optional year fields. The step accepts the Geburtsjahr from 1920 to the
+  current year minus 14, and a Berufseintritt not before 14 years after the Geburtsjahr. The summary shows the
+  years in the job.
+- The summary shows the new answers with links to change them.
+- Not yet used in the calculation: Berufsgruppe, Besoldungsgruppe, Geburtsjahr and Berufseintritt.
+- Validation: `npm test` (all pass). Manual check in headless Chromium at 1280 px and 390 px width: Beamte see
+  the Besoldungsgruppe (11 steps), other groups skip it (10 steps) also with the back button, the year
+  validation shows a message, and the summary shows no script errors.
+
+
 ## 2026.10005
 
 Step-by-step questionnaire at `/fragebogen` (no plan).

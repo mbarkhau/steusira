@@ -13,11 +13,11 @@
   <main class="fragebogen">
     <header class="fb-kopf">
       <a class="fb-marke" href="/">Steusira</a>
-      <div class="fortschritt" id="fortschritt" role="progressbar" aria-valuemin="0" aria-valuemax="8"
+      <div class="fortschritt" id="fortschritt" role="progressbar" aria-valuemin="0" aria-valuemax="10"
         aria-valuenow="1">
         <div class="fb-zeile">
           <button type="button" class="zurueck" id="zurueck">← Zurück</button>
-          <span id="schritt-text">Schritt 1 von 8</span>
+          <span id="schritt-text">Schritt 1 von 10</span>
         </div>
         <ol class="segmente" id="segmente"></ol>
       </div>
@@ -68,6 +68,44 @@
         <div class="frage"><h2>In welchem Bundesland wohnen Sie?</h2><p>Das Bundesland bestimmt zum Beispiel den
           Satz der Kirchensteuer.</p></div>
         <div class="wahl laender" id="laender"></div>
+      </section>
+
+      <section class="schritt" data-schritt="beruf" hidden>
+        <div class="frage"><h2>In welcher Berufsgruppe arbeiten Sie?</h2><p>Gesundheit, Pflege und Soziales
+          finanzieren sich überwiegend aus Pflichtbeiträgen und Steuern.</p></div>
+        <div class="wahl berufe">
+          <button type="button" data-wert="selbststaendig">Selbstständig</button>
+          <button type="button" data-wert="privat" data-vorgabe>Angestellt in der Privatwirtschaft</button>
+          <button type="button" data-wert="sozial">Angestellt in Gesundheit, Pflege, Soziales</button>
+          <button type="button" data-wert="oeffentlich">Angestellt im öffentlichen Dienst</button>
+          <button type="button" data-wert="beamte">Beamte, Richter, Soldaten</button>
+          <button type="button" data-wert="keine">Nicht erwerbstätig</button>
+        </div>
+      </section>
+
+      <section class="schritt" data-schritt="besoldung" hidden>
+        <div class="frage"><h2>In welcher Besoldungsgruppe sind Sie?</h2><p>Die Besoldungsgruppe steht auf
+          der Bezügemitteilung.</p></div>
+        <div class="wahl besoldung" id="besoldung"></div>
+      </section>
+
+      <section class="schritt" data-schritt="lebenslauf" hidden>
+        <div class="frage"><h2>Geburtsjahr und Berufseintritt</h2><p>Beide Angaben sind freiwillig. Berufseintritt
+          ist das Jahr, in dem Sie die erste Ausbildung oder Stelle angetreten haben.</p></div>
+        <div class="paar">
+          <div class="feld">
+            <label for="geburtsjahr">Geburtsjahr</label>
+            <div class="zahl"><input id="geburtsjahr" name="geburtsjahr" inputmode="numeric" maxlength="4"
+              placeholder="z. B. 1985"></div>
+          </div>
+          <div class="feld">
+            <label for="berufseintritt">Berufseintritt</label>
+            <div class="zahl"><input id="berufseintritt" name="berufseintritt" inputmode="numeric" maxlength="4"
+              placeholder="z. B. 2005"></div>
+          </div>
+        </div>
+        <p class="fb-hinweis" id="lebenslauf-fehler" hidden></p>
+        <button type="submit" class="weiter">Weiter</button>
       </section>
 
       <section class="schritt" data-schritt="einkommen" hidden>
@@ -126,7 +164,7 @@
   </main>
   <footer>
     <p>*Zahlen unter Vorbehalt</p>
-    <p>&copy; <span id="year">2026</span> Steusira · Version 2026.10005</p>
+    <p>&copy; <span id="year">2026</span> Steusira · Version 2026.10006</p>
   </footer>
   <script>document.getElementById("year").textContent = new Date().getFullYear();</script>
 </body>
